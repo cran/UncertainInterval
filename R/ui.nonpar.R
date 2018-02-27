@@ -1,11 +1,11 @@
 #' Function for the determination of an inconclusive interval for continuous test scores
 #'
-#' @name uncertain.interval
-#' @description This function determines an interval around the intersection of the two distributions of individuals without (0) and with (1) the targeted condition. The interval is restricted both by a maximum sensitivity of the test scores within the uncertain interval (sens.ui) and by a maximum specificity of the test scores within the uncertain interval (spec.ui).
+#' @name ui.nonpar
+#' @description This function uses a non-parametric approach to determine an interval around the intersection of the two distributions of individuals without (0) and with (1) the targeted condition. The interval is restricted both by a maximum sensitivity of the test scores within the uncertain interval (sens.ui) and by a maximum specificity of the test scores within the uncertain interval (spec.ui).
 #' @param ref The reference standard. A column in a data frame or a vector indicating the classification by the reference test. The reference standard must be coded either as 0 (absence of the condition) or 1 (presence of the condition)
 #' @param test The index test or test under evaluation. A column in a dataset or vector indicating the test results in a continuous scale.
-#' @param sens.ui (default = .55). The sensitivity of the test scores within the uncertain interval is either limited to this value or is the nearest to this value. A value below .5 or larger than .6 is not recommended.
-#' @param spec.ui (default = .55). The specificity of the test scores within the uncertain interval is either limited to this value or is the nearest to this value. A value below .5 or larger than .6 is not recommended.
+#' @param sens.ui (default = .55). The sensitivity of the test scores within the uncertain interval is either limited to this value or is the nearest to this value. A value <= .5 is useless.
+#' @param spec.ui (default = .55). The specificity of the test scores within the uncertain interval is either limited to this value or is the nearest to this value. A value <= .5 is useless.
 #' @param intersection (default = NULL) When NULL, the intersection is calculated with \code{get.intersection}, which uses the kernel density method to obtain the intersection. When another value is assigned to this parameter, this value is used instead.
 #' @param return.first (default = TRUE) Return only the widest possible interval, given the restrictions. When FALSE all calculated intervals with their sensitivity and specificity are returned. NOTE: This function does not always find a suitable interval and can return a vector of NULL values.
 #' @param select (default = 'nearest') If 'nearest', sensitivity and specificity of the uncertain interval are nearest sens.ui and spec.ui respectively. When 'limited' the solutions have an uncertain interval with a sensitivity and specificity limited by sens.ui and spec.ui respectively.
@@ -14,7 +14,7 @@
 #' This function can be used for test with continuous scores or for test with about twenty or more ordened test scores.
 #' The Uncertain interval is defined as an interval below and above the intersection, with a sensitivity and specificity nearby or below a desired value (default .55).
 #'
-#' In its core, the \code{uncertain.interval} function is non-parametric, but it uses the gaussian kernel for estimating the intersection between the two distributions. Always check whether your results are within reason. If the results are unsatisfactory, first check on the intersection. The \code{density} function allows for other approximations. Another estimate can be obtained by using a more suitable kernel in the \code{density} function. The parameter \code{intersection} can be used to assign the new estimate to the \code{uncertain.interval} method.
+#' In its core, the \code{ui.nonpar} function is non-parametric, but it uses the gaussian kernel for estimating the intersection between the two distributions. Always check whether your results are within reason. If the results are unsatisfactory, first check on the intersection. The \code{density} function allows for other approximations than gaussian. Another estimate can be obtained by using a more suitable kernel in the \code{density} function. The parameter \code{intersection} can be used to assign the new estimate to the \code{uncertain.interval} method.
 #'
 #' Furthermore, only a single intersection is assumed (or an second intersection where the overlap is negligible). If another intersection exists and the overlap around this intersection is considerable, a second uncertain interval may be determined by using the parameter \code{intersection}. It should be noted that in most cases, a test with more than one intersection with non-negligible overlap is problematic and difficult to apply.
 #'
@@ -38,7 +38,6 @@
 #'  \item{specificity}{ Specificity of the test scores within the Uncertain interval.}
 #' }
 #' Only a single row is returned when parameter \code{return.first} = TRUE (default).}
-#' @export
 #' @importFrom reshape2 melt
 #' @references Landsheer, J. A. (2016). Interval of Uncertainty: An Alternative Approach for the Determination of Decision Thresholds, with an Illustrative Application for the Prediction of Prostate Cancer. PloS One, 11(11), e0166007.
 #'
@@ -47,12 +46,14 @@
 #' set.seed(1)
 #' ref=c(rep(0,500), rep(1,500))
 #' test=c(rnorm(500,0,1), rnorm(500,1,1))
-#' uncertain.interval(ref, test, select='limited')
+#' ui.nonpar(ref, test, select='limited')
 #'
 #' ref = c(rep(0,20), rep(1,20))
 #' test= c(rnorm(20), rnorm(20, mean=1))
-#' uncertain.interval(ref, test)
-uncertain.interval <-
+#' ui.nonpar(ref, test)
+#'
+#' @export
+ui.nonpar <-
   function(ref,
            test,
            sens.ui = .55,
@@ -66,18 +67,40 @@ uncertain.interval <-
       which((M == crit+mindiff) | (M == crit-mindiff), arr.ind=T)
     }
 
+    bootstrap=0 # experimental
     select = match.arg(select)
-    df = check.data(ref, test)
+    df = check.data(ref, test, model='kernel')
+
+    if (bootstrap > 0) {
+      # o4 = uncertain.interval(df$ref, df$test, sens.ui, spec.ui, intersection, return.first=T,
+      #                         select, bootstrap=0)
+      o4 = ui.nonpar(df$ref, df$test, sens.ui, spec.ui, intersection, return.first=T,
+                              select)
+      n = nrow(df) # n=10
+      for (i in 1:bootstrap){
+        sa = sample(n, replace=T)
+        # o5 = uncertain.interval(df$ref[sa], df$test[sa], sens.ui, spec.ui, intersection, return.first=T,
+        #                         select, bootstrap=0)
+        o5 = ui.nonpar(df$ref[sa], df$test[sa], sens.ui, spec.ui, intersection, return.first=T,
+                                select)
+        o4  = rbind(o4,o5)
+      }
+      if (return.first){
+        return(list(sample.est=o4[1,], boostrap.est=colMeans(o4[-1,])))
+      } else {
+        return(list(sample.est=o4[1,], boostrap.est=o4[-1,]))
+      }
+    }
     if (sens.ui < .5) stop('Value < .5 invalid for sens.ui')
     if (spec.ui < .5) stop('Value < .5 invalid for spec.ui')
-    if (sens.ui > .6) warning('Value > .6 not recommended for sens.ui')
-    if (spec.ui > .6) warning('Value > .6 not recommended for spec.ui')
+    # if (sens.ui > .6) warning('Value > .6 not recommended for sens.ui')
+    # if (spec.ui > .6) warning('Value > .6 not recommended for spec.ui')
 
     # only one relevant intersection assumed!
     # linear tests are used for determination of point of intersection
     # linear test is assumed to have a normal distribution
     if (is.null(intersection)) {
-      intersection = get.intersection(df$ref, df$test)
+      intersection = get.intersection(df$ref, df$test, model='kernel')
       if (length(intersection) > 1) {
         intersection = utils::tail(intersection, n = 1)
         warning('More than one point of intersection. Highest density used.')
