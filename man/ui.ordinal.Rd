@@ -12,11 +12,11 @@ ui.ordinal(ref, test, select.max = c("MCI.Sp+MCI.Se", "MCI.C", "MCI.Acc",
 \arguments{
 \item{ref}{The reference standard. A column in a data frame or a vector indicating the classification by the reference test. The reference standard must be coded either as 0 (absence of the condition) or 1 (presence of the condition)}
 
-\item{test}{The test pr predictor under evaluation. A column in a dataset or vector indicating the test results in a continuous scale.}
+\item{test}{The test pr predictor under evaluation. A column in a dataset or vector indicating the test results in a continuous scale. It is expected that true patients have higher scores than non-patients. If this is not the case, the test scores should be negated (test = -(test scores)).}
 
 \item{select.max}{Selects the candidate thresholds on basis of a desired property of the More Certain Intervals (MCI). The criteria are: maximum Se+Sp (default), maximum C, maximum Accuracy, maximum Sp, maximum Se, maximum size of MCI. The last alternative 'All' is to choose all possible details.}
 
-\item{constraints}{Sets constraints for various properties of the uncertain interval: C-statistic, Acc, lower and upper limit of the ratio of the proportions with and without the targeted condition. The default values are C = .57, Acc = .6, lower.ratio = .8, upper.ratio = 1.25. These values implement the desired uncertainty of the uncertain interval. The value of C is considered the most important and has the most restrictive default value. For Acc and C, the values closest to the desired value are found and then all smaller values are considered. The other constraints are straightforward limits. If you want to change the values, it is recommended to name all values. C = 1 or Acc = 1 excludes C respectively accuracy as selection criterion.}
+\item{constraints}{Sets upper constraints for various properties of the uncertain interval: C-statistic, Acc, lower and upper limit of the ratio of the proportions with and without the targeted condition. The default values are C = .57, Acc = .6, lower.ratio = .8, upper.ratio = 1.25. These values implement the desired uncertainty of the uncertain interval. The value of C is considered the most important and has the most restrictive default value. For Acc and C, the values closest to the desired value are found and then all smaller values are considered. The other two constraints are straightforward lower and upper limits of the ratio between the number of patients with and without the targeted disease. If you want to change these values, it is necessary to name all values. C = 1 or Acc = 1 excludes C respectively accuracy as selection criterion. If no solution is found, the best is showed together with  a warning message.}
 
 \item{weights}{(Default = c(1, 1, 1). Vector with weights for the loss function. weights[1] is the weight of false negatives, weights[2] is the weight for loss in the uncertain interval (deviations from equal chances to belong to either distribution), and weights[3] is the weight for false positives. When a weight is set to a larger value, thresholds are selected that make the corresponding error smaller while the area grows smaller.}
 
@@ -55,16 +55,16 @@ List of values:
      \item{fpr: }{The false positive rate when this test score is used as threshold.}
      \item{Y: }{The Youden Index (= tpr - fpr) when this test score is used as threshold.}
      }
-  \item{$intersection}{The (rounded) intersection for the distributions of the two groups. Most often, these distributions have no true point of intersection and the rounded intersection is an approximation. Often, this equals the Maximized Youden threshold (see Schisterman 2005). Warning: When a limited range of scores is available, it is more difficult to estimate the intersection. Different estimates can easily differ plusminus 1. When using a non-rounded value (for example 16.1), the effective threshold for the uncertain area is round(intersection+.5), in the mentioned example 17. }
+  \item{$intersection}{The (rounded) intersection for the distributions of the two groups. Most often, these distributions have no true point of intersection and the rounded intersection is an approximation. Often, this equals the Maximized Youden threshold (see Schisterman 2005). Warning: When a limited range of scores is available, it is more difficult to estimate the intersection. Different estimates can easily differ plusminus 1. When using a non-rounded value (for example 16.1), the effective threshold for the uncertain area is round(intersection+.5), in the mentioned example: 16.1 becomes 17. }
   \item{$uncertain.interval}{Data frame with the statistics of all possible bounds of the uncertain interval. The columns are the following: }
     \itemize{
       \item{lowerbound: }{Lower bound of the possible uncertain interval.}
       \item{upperbound: }{Upper bound of the possible uncertain interval.}
-      \item{UI.Sp: }{Specificity of the test scores between and including the lower and upper boundary. Closer to .5 is 'better', that is, more uncertain. As its estimate is dependent on the intersection, this is not recommended as a criterion. }
-      \item{UI.Se: }{Sensitivity of the test scores between and including the lower and upper boundary. Closer to .5 is 'better', that is, more uncertain. As its estimate is dependent on the intersection, this is not recommended as a criterion.}
-      \item{UI.Acc: }{Accuracy of the test scores between and including the lower and upper boundary. Closer to .5 is 'better', that is, more uncertain. As its estimate is dependent on the intersection, this is not recommended as a criterion.}
+      \item{UI.Sp: }{Specificity of the test scores between and including the lower and upper boundary. Closer to .5 is 'better', that is, more uncertain. This estimate is rough and dependent on the intersection and cannot be recommended as a criterion for a short, ordinal scale. }
+      \item{UI.Se: }{Sensitivity of the test scores between and including the lower and upper boundary. Closer to .5 is 'better', that is, more uncertain. This estimate is rough and dependent on the intersection and cannot be recommended as a criterion for a short, ordinal scale.}
+      \item{UI.Acc: }{Accuracy of the test scores between and including the lower and upper boundary. Closer to .5 is 'better', that is, more uncertain. This estimate is rough and dependent on the intersection and cannot be recommended as a criterion for a short, ordinal scale.}
       \item{UI.C: }{Concordance (AUROC) of the test scores between and including the lower and upper boundary. Closer to .5 is 'better', that is, more uncertain. Rule of thumb: <= .6}
-      \item{UI.ratio: }{The ratio between the proportion of patients in the uncertain area with and without the condition. Closer to one is better; 0.8 < UI.ratio < 1.25 as a rule of fist.}
+      \item{UI.ratio: }{The ratio between the proportion of patients in the uncertain area with and without the condition. Closer to one is 'better', that is, more uncertain; 0.8 < UI.ratio < 1.25 as a rule of fist.}
       \item{UI.n: }{Number of patients with test scores between and including the lower and upper boundary.}
       \item{MCI.Sp: }{Specificity of the more certain interval, i.e., the test scores lower than the lower boundary and higher than the upper boundary.}
       \item{MCI.Se: }{Sensitivity of the test scores lower than the lower boundary and higher than the upper boundary.}
@@ -81,7 +81,7 @@ List of values:
   }
 }
 \description{
-This function calculates the uncertain interval (UI) of the test results of the two groups. This function is intended to be used for tests with 20 or less ordered test values. The range of test scores identifies patients without the targeted condition (lower More Certain Interval (MCI)), the interval of test scores above the uncertain interval identifies the patients with the condition (upper MCI). Due to the limited number of distinguishable scores, the estimations are course. When more than 20 values can be distinguished, \code{\link{ui.nonpar}} or \code{\link{ui.binormal}} may be preferred.
+This function calculates the uncertain interval (UI) of the test results of the two groups. This function is intended to be used for tests with 20 or less ordered test values. The lower range of test scores identifies patients without the targeted condition (lower More Certain Interval (MCI)), the upper interval of test scores above the uncertain interval identifies the patients with the condition (upper MCI). Due to the limited number of distinguishable scores, the estimations are course. When more than 20 values can be distinguished, \code{\link{ui.nonpar}} or \code{\link{ui.binormal}} may be preferred.
 }
 \details{
 Due to the limited possibilities of short scales, it is more difficult to determine a suitable uncertain interval when compared to longer scales. For any threshold determination, one needs a representative sample of sufficient size (200 or larger). If there are no test scores below the intersection in the candidate uncertain area, Sp of the Uncertain Interval (UI.Sp) is not available, while UI.Se equals 1.
@@ -118,8 +118,11 @@ test = c(test0, test1)
 table(ref, test)
 plotMD(ref, test, model='ordinal') # visual inspection
 ui.ordinal(ref, test, select.max='All')
+# Same solution, but other layout of the results:
+ui.ordinal(ref, test, select.max=c('MCI.Sp+MCI.Se', 'MCI.C', 'MCI.Acc',
+                                   'MCI.Se', 'MCI.Sp', 'MCI.n'))
 # forcing the Youden threshold as intersection gives the same best result.
-# However, the estimates for ui.Se, ui.Sp and ui.Acc differ.
+# However, the estimates for ui.Se, ui.Sp and ui.Acc differ:
 ui.ordinal(ref, test, intersection='Youden', select.max='All')
 
 nobs=1000
@@ -133,6 +136,9 @@ f1=cut(Z1, breaks = b0, labels = c(1:30))
 x1=as.numeric(levels(f1))[f1]
 ref=c(rep(0,nobs), rep(1,nobs))
 test=c(x0,x1)
+plotMD(ref, test, model='ordinal') # looks like binormal
+# looks less binormal, but in fact it is a useful approximation:
+plotMD(ref, test, model='binormal')
 ui.ordinal(ref, test)
 ui.binormal(ref, test) # compare application of the bi-normal model
 }

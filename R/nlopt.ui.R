@@ -44,6 +44,8 @@
 #' nlopt.ui()
 #' # Using another bi-normal distribution:
 #' nlopt.ui(mu0=0, sd0=1, mu1=1.6, sd1=2)
+#' 
+# Se = .55; Sp = .55; mu0 = 0; sd0 = 1; mu1 = 1; sd1 = 1; intersection = NULL; start=NULL; print.level=0
 nlopt.ui <- function(Se = .55, Sp = .55,
                      mu0 = 0, sd0 = 1,
                      mu1 = 1, sd1 = 1,
@@ -57,17 +59,27 @@ nlopt.ui <- function(Se = .55, Sp = .55,
   c01 = Sp / (1 - Sp)
   c11 = Se / (1 - Se)
   if (is.null(intersection)) {
-    f <- function(x)
-      dnorm(x, mean = mu0, sd = sd0) - dnorm(x, mean = mu1, sd = sd1)
+    intersect.binormal1 <- function(mu0, sd0, mu1, sd1) {
+        if (sd0==sd1){
+          is <- (mu1+mu0)/2
+        }else{
+          B <- (mu0 / sd0 ^ 2 - mu1 / sd1 ^ 2)
+          A <- 0.5 * (1 / sd1 ^ 2 - 1 / sd0 ^ 2)
+          C <-
+            0.5 * (mu1 ^ 2 / sd1 ^ 2 - mu0 ^ 2 / sd0 ^ 2) - log(sd0 / sd1)
+          
+          is = (-B + c(1, -1) * sqrt(B ^ 2 - 4 * A * C)) / (2 * A)
+        }
+        d = dnorm(is, mu0, sd0) + dnorm(is, mu1, sd1)
+        is[order(d)] # tail has highest density
+      }
 
-    I = uniroot.all(f, interval = c(max(mu0 - 3 * sd0, mu1 - 3 * sd1),
-                                    min(mu0 + 3 * sd0, mu1 + 3 * sd1)))
-    if (length(I) > 1) {
-      d = dnorm(I, mu0, sd0)
-      I = I[which.max(d)]
-      warning('More than one point of intersection. Point with highest density used.')
-    }
-  } else I = intersection
+      intersection = intersect.binormal1(mu0, sd0, mu1, sd1)
+      if (length(intersection) > 1) {
+        intersection=tail(intersection, n=1)
+        warning('More than one point of intersection. Highest used.')
+      }
+  } 
 
   # objective function -(H - L)^2
   eval_f0 <- function(x) {
@@ -82,10 +94,10 @@ nlopt.ui <- function(Se = .55, Sp = .55,
 
   # constraint function
   eval_g0 <- function(x) {
-    a0 = pnorm(I, mu0, sd0) - pnorm(x[1], mu0, sd0) # TN within the uncertain interval
-    b0 = pnorm(x[2], mu0, sd0) - pnorm(I, mu0, sd0) # FP
-    a1 = pnorm(x[2], mu1, sd1) - pnorm(I, mu1, sd1) # TP
-    b1 = pnorm(I, mu1, sd1) - pnorm(x[1], mu1, sd1) # FN
+    a0 = pnorm(intersection, mu0, sd0) - pnorm(x[1], mu0, sd0) # TN within the uncertain interval
+    b0 = pnorm(x[2], mu0, sd0) - pnorm(intersection, mu0, sd0) # FP
+    a1 = pnorm(x[2], mu1, sd1) - pnorm(intersection, mu1, sd1) # TP
+    b1 = pnorm(intersection, mu1, sd1) - pnorm(x[1], mu1, sd1) # FN
 
     return(c(a0 - c01 * b0,
              a1 - c11 * b1)) # vector with two constraint values
@@ -101,14 +113,14 @@ nlopt.ui <- function(Se = .55, Sp = .55,
     )))
   }
 
-  if (is.null(start)) par0=c(L=I-.5*sd1,
-                             H=I+.5*sd0) else par0=c(L=start[1], H=start[2])
+  if (is.null(start)) par0=c(L=intersection-.5*sd1,
+                             H=intersection+.5*sd0) else par0=c(L=start[1], H=start[2])
 
   res0 <- nloptr( x0=par0,
                   eval_f=eval_f0,
                   eval_grad_f = eval_grad_f0,
-                  lb = c(I-2*sd1, I),
-                  ub = c(I, I+2*sd0),
+                  lb = c(intersection-2*sd1, intersection),
+                  ub = c(intersection, intersection+2*sd0),
                   eval_g_ineq = eval_g0,
                   eval_jac_g_ineq = eval_jac_g0,
                   # eval_g_eq = eval_g0,
@@ -122,13 +134,13 @@ nlopt.ui <- function(Se = .55, Sp = .55,
   )
 
   # res0 <- nloptr(
-  #   x0 = c(I - sd1, I + sd0),
+  #   x0 = c(intersection - sd1, intersection + sd0),
   #   eval_f = eval_f0,
   #   eval_grad_f = eval_grad_f0,
   #   eval_g_ineq = eval_g0,
   #   eval_jac_g_ineq = eval_jac_g0,
-  #   lb = c(I-2*sd1, I),
-  #   ub = c(I, I+2*sd0),
+  #   lb = c(intersection-2*sd1, intersection),
+  #   ub = c(intersection, intersection+2*sd0),
   #   opts = list(
   #     "algorithm" = "NLOPT_LD_MMA",
   #     "xtol_rel" = 1.0e-8,
@@ -138,14 +150,14 @@ nlopt.ui <- function(Se = .55, Sp = .55,
   #     )
   #   )
 
-  TN = pnorm(I, mu0, sd0) - pnorm(res0$solution[1], mu0, sd0)  # area check Sp: lower area / upper area
-  FP = pnorm(res0$solution[2], mu0, sd0) - pnorm(I, mu0, sd0)
-  TP = pnorm(res0$solution[2], mu1, sd1) - pnorm(I, mu1, sd1)  # area check Se: upper area / lower area
-  FN = pnorm(I, mu1, sd1) - pnorm(res0$solution[1], mu1, sd1)
+  TN = pnorm(intersection, mu0, sd0) - pnorm(res0$solution[1], mu0, sd0)  # area check Sp: lower area / upper area
+  FP = pnorm(res0$solution[2], mu0, sd0) - pnorm(intersection, mu0, sd0)
+  TP = pnorm(res0$solution[2], mu1, sd1) - pnorm(intersection, mu1, sd1)  # area check Se: upper area / lower area
+  FN = pnorm(intersection, mu1, sd1) - pnorm(res0$solution[1], mu1, sd1)
   res = list()
   res$status = res0$status
   res$message = res0$message
-  res$intersection = I
+  res$intersection = intersection
   res$results = c(exp.Sp.ui = ifelse((TN > 1e-4),TN / (FP + TN), NA),
                   exp.Se.ui = ifelse(TP > 1e-4, TP / (FN + TP), NA),
                   mu0=unname(mu0), sd0=unname(sd0), mu1=unname(mu1), sd1=unname(sd1))

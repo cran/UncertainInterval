@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Hans Landsheer" />
+
+
+<title>Vignette Uncertain Interval</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Vignette Uncertain Interval</h1>
+<h4 class="author"><em>Hans Landsheer</em></h4>
+<h4 class="date"><em>24-2-2018</em></h4>
+
+
+
+<div id="introduction-to-the-uncertaininterval-package" class="section level2">
+<h2>Introduction to the UncertainInterval package</h2>
+<div id="identifying-test-scores-that-are-most-uncertain" class="section level3">
+<h3>Identifying test scores that are most uncertain</h3>
+<p>Medical tests (or bio-markers) are designed to distinguish patients with a targeted condition from the patients without that condition, and to allow for a decision for or against a treatment of that condition. For this purpose, most often a dichotomous threshold is determined and patients with a test score higher than that threshold can receive treatment. This decision is often made with considerations of costs and possible side effects of treatment, but without considering possible uncertainty of the patient’s obtained test score.</p>
+<p>The uncertain interval method allows for the determination of an interval of test scores that are too uncertain for distinguishing patients with and without the targeted condition. Typically, a patient with such a test score would either receive additional tests (when available) to obtain more certainty about the true status of the patient, or further developments of symptoms can be awaited. The latter approach can vary from regular active surveillance to informing the patient which changes in symptoms should trigger further diagnostics.</p>
+<p>An uncertain test score has another weighing of costs than solely a decision for or against the presence of the disease. A patients with an uncertain test score should not be exposed to treatment costs. When the existence of the disease is uncertain, the benefits of treatment would be highly uncertain while the risks of possible negative side effects of a treatment remain present.</p>
+<p>In this vignette, first the theoretical basis of the uncertain interval method is explained. Next, an example dataset is analyzed to illustrate the various possibilities of the method. The use of PSA scores as an early indicator of prostate cancer are discussed as an example.</p>
+<p>The PSA test is a relatively weak test, and demonstrates the clear existence of an interval of uncertain test scores. Prostate cancer in itself is often a slow growing form of cancer and patients with this disease do not necessarily die from the disease. On the other hand, prostate cancer treatments can have serious side effects that seriously affect the quality of life, such as incontinence and sexual dysfunctions, without necessarily leading to a longer life span. Therefore, the current policy is to prevent over-treatment and to offer patients active surveillance of their disease. The question which PSA scores should lead to informing the patient that prostate cancer is very unlikely, which test scores should lead to immediate further diagnostics and possible treatment and which test scores should lead to active surveillance is therefore relevant. The intention of this vignette is to illustrate how the functions in the UncertainInterval package can be used to answer this kind of questions.</p>
+<div id="intersection-and-overlap" class="section level4">
+<h4>Intersection and Overlap</h4>
+<p>Test are not perfect and uncertainty whether the test can distinguish the patients is dependent on the test score. Most often, high and low test scores are the most certain, but test scores in the middle are far less certain. The test scores at the point of the intersection of the two distributions is most uncertain (figure 1): the probability that the patient belongs to the population of patients with the targeted disease (H1) is equal to the probability that the patient belongs to the population of patients without the disease (H0).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">intersect.binormal &lt;-<span class="st"> </span><span class="cf">function</span>(m1, sd1, m2, sd2, <span class="dt">p1=</span>.<span class="dv">5</span>, <span class="dt">p2=</span>.<span class="dv">5</span>){
+  
+  B &lt;-<span class="st"> </span>(m1<span class="op">/</span>sd1<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>m2<span class="op">/</span>sd2<span class="op">^</span><span class="dv">2</span>)
+  A &lt;-<span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>(<span class="dv">1</span><span class="op">/</span>sd2<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">1</span><span class="op">/</span>sd1<span class="op">^</span><span class="dv">2</span>)
+  C &lt;-<span class="st"> </span><span class="fl">0.5</span><span class="op">*</span>(m2<span class="op">^</span><span class="dv">2</span><span class="op">/</span>sd2<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>m1<span class="op">^</span><span class="dv">2</span><span class="op">/</span>sd1<span class="op">^</span><span class="dv">2</span>) <span class="op">-</span><span class="st"> </span><span class="kw">log</span>((sd1<span class="op">/</span>sd2)<span class="op">*</span>(p2<span class="op">/</span>p1))
+  
+  <span class="cf">if</span> (A<span class="op">!=</span><span class="dv">0</span>){
+    (<span class="op">-</span>B <span class="op">+</span><span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>,<span class="op">-</span><span class="dv">1</span>)<span class="op">*</span><span class="kw">sqrt</span>(B<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>A<span class="op">*</span>C))<span class="op">/</span>(<span class="dv">2</span><span class="op">*</span>A)
+  } <span class="cf">else</span> {<span class="op">-</span>C<span class="op">/</span>B}
+} 
+
+x =<span class="st"> </span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>,<span class="dv">8</span>,<span class="dt">length=</span><span class="dv">1000</span>)
+mu0=<span class="dv">0</span>; sd0=<span class="dv">1</span>; mu1=<span class="dv">2</span>; sd1=<span class="dv">2</span>
+y0 &lt;-<span class="st"> </span><span class="kw">dnorm</span>(x,mu0, sd0)
+y1 &lt;-<span class="st"> </span><span class="kw">dnorm</span>(x, mu1, sd1)
+is=<span class="kw">intersect.binormal</span>(mu0, sd0, mu1, sd1)
+<span class="kw">plot</span>(x,y0,<span class="dt">type=</span><span class="st">'l'</span>, <span class="dt">col=</span><span class="st">'green'</span>, <span class="dt">xlab=</span><span class="st">'predictor'</span>, <span class="dt">ylab=</span><span class="st">'density'</span>, <span class="dt">main=</span><span class="st">'Figure 1'</span>)
+<span class="kw">lines</span>(x,y1,<span class="dt">type=</span><span class="st">'l'</span>, <span class="dt">col=</span><span class="st">'black'</span>)
+<span class="kw">legend</span>(<span class="st">'topright'</span>, <span class="dt">legend=</span><span class="kw">c</span>(<span class="st">'H0'</span>, <span class="st">'H1'</span>), <span class="dt">lty=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>), <span class="dt">col=</span><span class="kw">c</span>(<span class="st">'green'</span>, <span class="st">'black'</span>), <span class="dt">cex=</span>.<span class="dv">7</span>)
+threshold =<span class="st"> </span><span class="kw">qnorm</span>(.<span class="dv">90</span>, mu0, sd0) <span class="co"># allowing a FPR of .1</span>
+<span class="kw">abline</span>(<span class="dt">v=</span><span class="kw">c</span>(is[<span class="dv">2</span>], threshold), <span class="dt">col=</span><span class="kw">c</span>( <span class="st">'red'</span>, <span class="st">'black'</span>))
+<span class="kw">text</span>(<span class="fl">1.9</span>, <span class="fl">0.03</span>, <span class="kw">expression</span>(alpha), <span class="dt">col=</span><span class="st">'green'</span>)
+<span class="kw">text</span>(<span class="dv">0</span>, <span class="fl">0.03</span>, <span class="kw">expression</span>(beta), <span class="dt">col=</span><span class="st">'black'</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Around the intersection, the test scores are found that are the most uncertain. If we define a threshold (black line) close to the intersection (red line), we can be certain to miss-diagnose about 50% of the patients that have test scores close to the intersection. Furthermore, the diagnoses based om test scores close to the intersection give most unreliable decisions: a second measure is bound to give results slightly lower or slightly higher. A result slightly above the threshold can be slightly below this point when measuring again and would change from a positive decision into a negative decision for the disease to be present, while in reality little has changed.</p>
+<p>The intersection is also the point where the sum of false positive rate (FPR = <span class="math inline">\(\alpha\)</span> (alpha error) = 1 - Sp) and false negative rate (FNR = <span class="math inline">\(\beta\)</span> (beta error) = 1 - Se) is minimal. The intersection is therefore the same as the Youden threshold, the point where the sum of true positive rate (TPR = Se) and true negative rate (TNR = Sp) is maximal. Small differences may occur as a result of differences in estimation methods, but they are in principle the same.</p>
+<p>Note: Tests that have more than one intersection can be problematic. When an intersection occurs in a region where the densities are very low, such an intersection can be ignored. When this is not the case, extra intersections indicate a lower quality of the test. Furthermore, an extra intersection indicates the existence of a region where the interpretation of results is reversed and not straightforward.</p>
+<p>The uncertain interval method offers the possibility to determine an interval that can be considered to be too uncertain to distinguish one type of patient from the other type. This indicates to the decision maker that more information is needed before a final decision can be made. A secondary advantage is that the decision maker can be more certain about a patient with scores outside the defined middle range of test scores. A first publication is Landsheer (2016).</p>
+<p>An example (Figure 2) is provided, using a file of the PSA bio-marker for the identification of prostate cancer (Etzioni R, Pepe M, Longton G, Hu C, Goodman G, 1999):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(UncertainInterval)
+<span class="kw">data</span>(psa2b)
+<span class="kw">names</span>(psa2b)
+<span class="co">#&gt; [1] &quot;id&quot;   &quot;d&quot;    &quot;t&quot;    &quot;fpsa&quot; &quot;tpsa&quot; &quot;age&quot;</span>
+<span class="kw">plotMD</span>(psa2b<span class="op">$</span>d, psa2b<span class="op">$</span>tpsa)
+<span class="kw">abline</span>(<span class="dt">v=</span><span class="dv">4</span>, <span class="dt">col=</span><span class="st">'red'</span>)</code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAqAAAAHgCAMAAABNUi8GAAAApVBMVEUAAAAAADoAAGYAAP8AOjoAOpAAZmYAZpAAZrY6AAA6ADo6AGY6OgA6Ojo6OmY6OpA6ZmY6kLY6kNtmAABmADpmAGZmOgBmZgBmZmZmtv+QOgCQOjqQZgCQkGaQtpCQ29uQ2/+2ZgC2Zjq2Zma225C2/7a2/9u2//+/j8+/v//Pj7/bkDrbtrbb/7bb/9vb////AAD/tmb/v7//25D//7b//9v////i5LUCAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAVOklEQVR4nO3dDXujynmAYWxlWzlJm9Y6TSKdnNTqR7ZnaWPJlvT/f1oZho9BgIYZMbyv7ee+kj2yDYzEPosASyi7AIpl0ncAuIVAoRqBQjUChWoECtUIFKoRKFQjUKhGoFCNQKEagUI1AoVqBArVCBSqEShUI1CoRqBQjUChGoFCNQKFagQK1QgUqhEoVCNQqEagUI1AoRqBQjUChWoECtUIFKoRKFQjUKhGoKPyLMsevxc3Tpvi1vZy3mXfXm/PsrczVDMbvjkq9bL/8/uUYb4SAh1lGnt4KW4cs/hAzYwT2GWfNo8EeoVARxWN/ebp2dx4+P3EzoYCLRufpp0dNQIdVTT2D5t1cWP/+KdmC/r+ZLZvxc0ypX0R4NpOvTcpuoE2ewfriztlXk5WZZvXewHlss002ePfqi1ou+w8YF/h0yHQUUUX/7grMjttvv2lfYrPzc1juUUt903tfmrxs6z5ws5sbxXTlM/dzQ9zZ8OaN/P0Au3P8UU3rgQ6qgjjeV909P70nLeBmj//r6zOPiMXJT2Xu6nrcqN3Hai94UyZl9OYZZtvrMtZn6tl75tWnTmcqb4iAh1lIjoWYebZ1gm06DX7p3L7Z4NzCjTfGQj04cWdslyUWcja/FFPfh2oM4cz1VdEoKNMoO9P60uxFXUDLXcOTT1FOfWzdfGjak9zMFBnyvLri90sVvsFZlnXgXaXXU/1FRHoKBNosf/592I/tBNoEU979slGZJ+GRwN1pnQDrXc0m2W3gbpztFN9RQQ6ylR53j389anspQm03KJVz/V1M+3G9TrQ8njfmbIT6KU5Qh/Ygm67d+WrHscT6Khys7nP/lyk5AZaFPZL+YzbRHa5jO6DmprXnSndQM8/v1TzDuyDNnO0Uy320BUh0FFloHnWnFayEZnDm+KWqWxvvmvPIw0cxbsn6p0pnUCbc6r1FrT8Wd1qPYczlez6kEGgo8pA7Q5nG6g9RV8ehNc7hw92A3d9HrRmnqqdKd0taN4kbPs79s6DOmdLA34j9ZkQ6Ki8OkKxQW6boxdzPF1u4NrdUfudbDv6YpF2ys4+aHmwXp3ot2dWs4d/v9rVdab6iggUqhEoVCNQqEagUI1AoRqBQjUChWoECtUIFKoRKFQjUKhGoFCNQKEagUI1AoVqBArVCBSqEShUI1CoRqBQjUChGoFCNQKFagQK1QgUqhEoVCNQqEagUI1AoRqBQjUChWqLBLpyb9gRD0uMO5OMf8VyCNSPQAURqB+BCiJQPwIVRKB+BCqIQP0IVBCB+hGoIAL1I1BBBOpHoIII1I9ABRGoH4EKIlA/AhW0TKC/VsyNrLx1MH8sMfYMCHQS+zm7cyNQPwLtqf9C3e/t1+Z/cyNQPwLtGQj09NPL5f13s29CCdSPQHsGAjVxmkhnRqB+BNpDoJoQaA+BakKgPQSqCYFOwUGSGAKdhNNMUgh0ktOGE/UyCFQQgfoRqCAC9SNQQQTqR6CCCNSPQAURqB+B3uHeU6ME6kegPf9T8U9JoOkRaA+BakKgPUOBvj9lDy+mx/Nua0/av//zHx//q/jGMcuy9eX88y/mP4EI1I9AewYCPW22l+Pj33bby/sf/l78mX97fX/ami1o+ZOHl/Pusbj5HDgSgfoRaM9AoNWrmfL1JX+ubr//tnn9SPFVsWG9XPLQTSiB+hFoz0Cgx2+v5sm92Hz+/FI822fV8335/yfzVRmomSoIgfoRaM/4FvTyH3/9w2u12awCNRtStqAJEegUdh/UHBE9my1pWaYN1Hx3b7ag317NRGEI1I9AJymP4otQ/+17+dK7h5d6C3reZdm/7rbn3Z+zLPQYiUAnINBZlE/xwQjUj0Bn8RECNYUS6BdFoKkQqCAC9SNQQQTqR6CCCNSPQHveKt3vJnhbPIFOQKA9g4GeNh/+bccE+kkMBZpn/8IWVASB9gwF+r+vPMXLINAe9kE1IdAeAtWEQHsIVBMCnYhAZRDoRAQqg0AnIlAZBCooZN3b94yaNzkH/saAQBErONDcvC0v8K0lBIpYoYFWaeZB7x4lUMQKDdRcLKJwDHqSJ1DEYgvqR6CCwgLNMnv5p8BL7BAoYgWue/t+52Pg25sJFLE4D+pHoIII1I9ABRGoH4EKWjjQolACRYDwo3gr8jwogSJM0Lo3F3GOGYRAESts3Z93UZ+3TKCIFbjuj9ngq0Tap/7BuQgUsWZe9wSKeRGoH4EKIlA/AhUUue7zkcN5AsW82IL6EaggAvUjUEEE6keggkJP1Ht+0UmgmFfQus/rFyqPvmKZQDGvkHV/3jVZjr0niUAxr7BXMzW/5xx7VyeBYl5sQf0IVFDgPmi1CWUfFAsJW/f1S5ZH3xVPoJgX50H9CFQQgfoRqCAC9SNQQQTqR6CCCNSPQAURqB+BCiJQPwIVRKB+BCqIQP0IVBCB+hGoIAL1I1BBSwf664pAEYBA/QhUEIH6EaggAvUjUEEE6kegggjUj0AFEagfgQoiUD8CFUSgfgQqiED9CFQQgfoRqCAC9SNQQQTqR6CCCNSPQAURqB+BCiJQPwIVRKB+BCpo8UB5RT1CEKgfgQoiUD8CFUSgfgQqiED9CFQQgfoRqCAC9SNQQQTqR6CCCNSPQAURqB+BCiJQPwIVRKB+BCpIINADgWKyxQM9ZGWcBIpJlg708CuBIkCz7k+bbD3j4jpW7c2DmeRQ/u/DIFBBzrrPs2zsQ4xjFudY/agdfvzIyj8P5qs7B1sKgQrqrvu7G50WaPEfAsUk1+veJPr4fWzq885+HPfoFASKeXXW/bFob1tUOPZx8Hm9eT2ObWc9gZosCRQB2nVfHCVltszjyAbyvGuyzEcaJlDMyzmKf3jxTHvabOubYw1PCdR8dSBQTNIG+pPtcyy9y2xbUALFdL1A8/FAi33QahMatg/aOUYiUISo1v0+a9w6zWT2U42xoyhPoGWVBIoAvS3oTItzDQTKQRKmWeJ38QSKaATqR6CC7Lo/bZ7r3csbv0eavLgrBIpoIeu+aXg8YwLFvILW/Xnn27zeDLSMsg70QKCYwP1V57N5qcjoGSTjvPO8ZpRAMa923e+/vb4/rS/7mwkes+3Qt9un/qGfEiiiOb+L35b53fhVZ8jiXASKaJ1A90Wct37VGbA4F4EimvMUvz5tvr2eNne9M4lAMa/O60EfXrxHQZWx7ez0QM1XEfdXAoEKWvA3SbZPAkUIAvUjUEHtuve+IS5scQ4CRTTnIGlCmXHv6iRQRHNOM/nfEB/5rk4CRbTOeVCP2PckXQX6Y/WjurhIxP2VQKCCmnU/4QRT7Ls6CRTR2nU/8mt2B1tQLM69up33KP6+d3USKMKFrft73tVZ9dkG+uOjXIKRQAUtd6KeQBHBWffF5vHb6/6+K4QSKOblHCQ9vOTm1UzzXx+UQBHNOc30XB6bJ3s9aD/Qj1IogQrqnKg3gSZ7RT2BIkJvC7q/+a65yYtzESiiXe+D5t7T9RMX5yBQROsexWeZ9yq2kxfXIlBEW+w8aN2nG+gH+bQkAhVEoH4EKujqd/F3HSFdJgZqCiVQTFKv+709OMrv/Kw5AsW8qnV/rA+O3p8SHcUTKGLYde+8Wvn2tZmmLe4KgSJacwHb+hupftU5GOjHKJRABdWBet/MEbK4KwSKaATqR6CCCNSPQAUtFWjTJ4EiRB2o9+MRQhZ3hUARbalfdRIooggH+iEKJVBBBOpHoIII1I9ABRGoH4EKIlA/AhVEoH4EKkg60I9QKIEKIlA/AhW0UKBtnwSKEATqR6CCRAItCiVQTEKgfgQqSDzQD1AogQoiUD8CFUSgfgQqiED9CFQQgfoRqCAC9SNQQfKB6i+UQAUtE6jTJ4EiBIH6EaggAvUjUEEE6kegghQEqr5QAhVEoH4EKihk3duriB5vXR6HQDGv4EDNp9G5FxubsDgCRbTQQKs085GPAxkO1O2zDPTHikAxSWig1YcsjF2kMSpQ7YUSqCANW1ACxaiwQM31Q9eXzocuTFgcgSJa4LovGn14KQ7kxz7ui0AxryXOg3b6JFCEUBGo8kIJVFDYuj/vPNexJ1DMK2jdNx81O7oTSqCYV8i6P+/aD0wMOc1EoIgWdprJ+2lKBIp5LbAFXfkD1V0ogQoK3AetNqHX+6Dtx4ANzEWgiBe27utPpBvZfg4v7nAhUMRa4DzolEBVF0qgggjUj0AFRa77POAoflKgmgslUEFatqAEikFqAlVcKIEKIlA/AhW0wItFCBTxFnixyI1A31wH53bgo0iLQAUt8KtOAkW89C8WOawIFNHSb0EnB+oWGvowkiJQQfO8WOTW4ggUd0j/YhECxR3SnwcdDPTHUKBOofPeqzsRqCAC9SNQQQTqR6CCVAXaFjrvvboTgQoiUD8CFaQr0KbQee/VnQhUUPJADxcCRTwC9SNQQcoCrQud917diUAFEagfgQrSFmhV6Lz36k4EKohA/QhUkLpAbaHz3qs7EaggsUBXBIoJUgd6uIQGWhY67726E4EKUhioKXTee3UnAhWkMdCi0Hnv1Z0IVJBgoCsChZdcoEWhY4G+6bqIA4EKEgvU/LEaC1RXoQQqiED9CFSQ0kBVXamJQAUlDtR0RqCIpzVQTYUSqCDRQC+jhRIoLLWBKiqUQAURqB+BCpIN9G2s0HpeFQhUEIH6EaigtIGWjcUGqqZQAhUkHehIoe3cChCoIOFAy0IHInVml0eggqQDNXUObEad2eURqCDxQIe3oe784ghUkO5AdRRKoIKSBmrzmvC249FAVRRKoIJ0BNor9HoZoghUkJZAVwSKIUoCvd6E9hYiiUAFaQn0qtD+UgQRqKCUgVZlESjipQ90dbkz0OtCD6V57/dNBCpITaDdQrtLdXJs0lwwUQIVpDXQ7jHT2+FQ/ae3+AUQqKCEgTa7oDMEato8HA4yO6cEKihs3Z939tOOH79PWNyEQN3vr9wvRi+K0xltoUIJVFDQus/rj4mf9HnxaQLtblbH0p0VgQoKWffnXZNlPvKJ8XcE2il0YqD1vimBfloh6/602dY3jyNP8s7i6uffpIEu8vGeBCoo3RY0OFC30OmBNhvRiAc/EYEKCtwHrTahE/ZBmwOY1IHWiUY8+IkIVFDYuj9t7FH8yPZTKNDqHFTU45+CQAWlOg/a5rJEoOVPDq5ZHxSBykkUaKfPqYEWha5Wq9hAVyv3XP+h544HRaDR7l79iU7URwZq8lzFBjr4/uVyHnuXolcUgcbqvIgibhFpTtQ7dyYk0PaZ/lJvFXvvBelsMt0+L+OBul80/6TfphxXlVNm2aIvnvqorlf74er8StxKTHKayb0n9wXaf7PS2BZzVb3J3hdov9TBHYG24rdVlq3epjfdXUCavWKVrldvu/5rUU9fAdNOPVHfuR/hgZpC7aMdeEfyfIEO1+ZsX5slm0DrpqetqaEJP32mI3l23mAWvgLm34Je3YeYQOuP+Fq99d5O132ncvuzlf3JYKExpwScPt+yrF3u8Hb32tXCHFM2pzc27HfPF7vsCbO+Oeto9PFfQv+VznOiPqtdj75ajYx4806uKp0vrlz97GrOOZmDpNXAA7nHzbxDpw+ZL3bZIbNOevTeiSozn6ifPOJHeq7jKF7Q8uueQBGAQP0IVFDkus9HT9VPHJFAMQlbUD8CFUSgfgQqiED9CFTQzC8WmTwigWKSmV8sMnlEAsUkM/+qc/KIBIpJZn6xyOQRCRSTLLEFzQYchr6JzymgsX48IRP739V5/xjRPtMoPJjImeNeLPKZ1vZH+DtVNsqSgeod43ONwoOZZ2ZFY3yuUXgw88ysaIzPNQoPZp6ZFY3xuUbhwcwzs6IxPtcoPJh5ZlY0xucahQczz8yKxvhco/Bg5pkZSI1AoRqBQjUChWoECtUIFKoRKFQjUKhGoFCNQKEagUI1AoVqBArVkgd6zLKHl5QDlJfjeV5iqH35XsG0o7w/Zdn6knqYvFhl28SjvP/ue2eEyKFSB3os7tQxZTbnXbH03Pylph7qWL6ZNe0ox2KI0yb1g8nNwk2hCUc5bcprezQjxA6VOFB7rYf9Ot0I709mU5A/fk891GljAk07il166gdz3q3twhOOcrRXmGtGiB4qcaBNPmmHMf82Uw+Vf/tLEWjaUd5/W21ikg7TBJpulGP2XF4dqRkheqjUgZZr/I4rOU20L1ZB2qGKxZt90LSjHB//e1PuUKcdpn6KTzqKDbQeIXqoxIHavY6kO6HlMMVfatqhzFOUCTTtKLl5XjQbuMTrrTpgSTpKGWMzQvRQnyLQY32MlDCdIs4FAn2otjNphymeb4on38T/pj9GoIs8xdtLmSUdqlx4+qd4u49W7K+lfTDNjiFP8UscJFXXfU46VF5dSHCb9gHZv8DiLzPpMM3WLO0oH+IgKf1ppuaakOmH2ic/zWQvEXxMfJrJxpJ6lOOHOM2U/kS92ZdaaKh9+hP1ef1vIOkw9T5o0lGOH+JEffnkmPQQqXryNWOkHsr+qjPtKMf697ZJh9kvMEq1v9mMEDkULxaBagQK1QgUqhEoVCNQqEagUI1AoRqBQjUChWoECtUIFKoRKFQjUKhGoFCNQKEagUI1AoVqBArVCBSqEShUI1CoRqBQjUChGoFCNQKFagQK1QgUqhFoiNOmugzjwGUEj/Yie9Wnr5SXP8qqj5TpOz682CvZdWdGD4GGaj7ooKvurQm0vNLYaVP+p+fqOm+dWOEi0FBBgY5dcZBApyLQUHWgeXUJQ/PZcObKy1n5OV/Xgb4/bU8//WJ2CXL3koe/1E/x5rvraubq0ovV9CgRaKgqUPN5B+YisOXlio/ZdnwLap/m6+nLq8cesypQ893T5rm8bT4YxnzK3NhuwddEoKFsoEVVF/t5HNXGbmwfdG0nbaa319/e20Dtd+3M9iLZZdDP12N+YQQaqvq8inIn0jyB28+k7Adqj+Kfq5800zdXxjbftrXaSeztconskLYINFQVaP2xH/bTlrdjB0mXOtB6+rwTaLU/2wZa3CJQF4GGcregtX17WnMs0Hp6tqBhCDRUvQ/qVuRs90YCbaavPjDo5j4ogbYINJRzFG+2nPVnrNStjQTaTF99kqtzFH/ercuZ26N4Am0RaCj3PGj5cZTVh+DsB8+DXpqNZz39wHnQauajc1CFCoHOrA4U8yDQmRHovAh0ZgQ6LwKFagQK1QgUqhEoVCNQqEagUI1AoRqBQjUChWoECtUIFKoRKFQjUKhGoFCNQKEagUI1AoVqBArVCBSqEShUI1Co9v82TZK/i8qbswAAAABJRU5ErkJggg==" alt="Figure 2" />
+<p class="caption">Figure 2</p>
+</div>
+<p>It is easy to see in figure 2 that the interpretation of these distributions of scores is problematic. A large overlap is found in the lower region, both distributions have long tails and there are multiple intersections. Both patients with (1) and without (0) prostate cancer can have low or high PSA scores. Using the usual threshold of 4 micro gram per liter (red line), it is easy to see that there are a considerable number of miss classifications and especially the number of false negatives (FN = 101) is high when compared to the number of true positives (TP = 128), resulting in a meager sensitivity of .56. Table 1 shows the confusion matrix.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t2 =<span class="st"> </span><span class="kw">table</span> (psa2b<span class="op">$</span>tpsa <span class="op">&gt;</span><span class="st"> </span><span class="dv">4</span>, psa2b<span class="op">$</span>d)
+<span class="kw">rownames</span>(t2) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'PSA &lt;= 4'</span>, <span class="st">'PSA &gt; 4'</span>)
+<span class="kw">library</span>(knitr)
+<span class="kw">kable</span>(<span class="kw">addmargins</span>(t2), <span class="dt">caption =</span> <span class="st">&quot;Table 1&quot;</span>)</code></pre></div>
+<table>
+<caption>Table 1</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">0</th>
+<th align="right">1</th>
+<th align="right">Sum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>PSA &lt;= 4</td>
+<td align="right">414</td>
+<td align="right">101</td>
+<td align="right">515</td>
+</tr>
+<tr class="even">
+<td>PSA &gt; 4</td>
+<td align="right">40</td>
+<td align="right">128</td>
+<td align="right">168</td>
+</tr>
+<tr class="odd">
+<td>Sum</td>
+<td align="right">454</td>
+<td align="right">229</td>
+<td align="right">683</td>
+</tr>
+</tbody>
+</table>
+<p>The higher the PSA score, the more certain the presence of prostate cancer is, but patients without prostate cancer can have high PSA values as well. Only the highest PSA values (&gt; 40) indicate for certain that these patients have prostate cancer, but choosing such a high threshold makes that the percentage of false negatives increases greatly.</p>
+<p>Determination of the most uncertain test scores may help. The function ui.nonpar dynamically calculates the sensitivity and specificity of the test scores <strong>within</strong> the uncertain interval to determine the lower and upper threshold of this interval of uncertain scores. This function uses the rank order of the sampled test scores and is non-parametric. The default values for the sensitivity and specificity of the test scores within the uncertain interval is .55, which means that the ratios TP/FN and TN/FP are .55/(1-.45) = 1.22. This interval is located around the intersection, which is determined in the ui.nonpar function by density estimation. This estimation is therefore semi-parametric. If needed, this estimation can be overridden by setting the intersection parameter of the ui.nonpar function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dt">res=</span><span class="kw">ui.nonpar</span>(psa2b<span class="op">$</span>d, psa2b<span class="op">$</span>tpsa))
+<span class="co">#&gt; Warning in ui.nonpar(psa2b$d, psa2b$tpsa): More than one point of intersection. Highest density used.</span>
+<span class="co">#&gt;         cp.l         cp.h           FN           TP           TN </span>
+<span class="co">#&gt;      1.92000      4.00000     27.00000     33.00000     55.00000 </span>
+<span class="co">#&gt;           FP  sensitivity  specificity intersection </span>
+<span class="co">#&gt;     45.00000      0.55000      0.55000      2.81317</span></code></pre></div>
+<p>The thresholds found are 1.92 and 4.00 and 27 + 33 + 55 + 45 = 160 observations are considered as uncertain or indeterminate. The function quality.threshold provides the quality indices of the lower and upper more certain intervals (MCI’s). In this case (using the default uncertain interval), the number of false negatives is reduced to 41.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dt">out=</span><span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, psa2b<span class="op">$</span>tpsa, res[<span class="dv">1</span>], res[<span class="dv">2</span>]))
+<span class="co">#&gt; $table</span>
+<span class="co">#&gt;      ref</span>
+<span class="co">#&gt; diag    0   1 Sum</span>
+<span class="co">#&gt;   0   314  41 355</span>
+<span class="co">#&gt;   NA  100  60 160</span>
+<span class="co">#&gt;   1    40 128 168</span>
+<span class="co">#&gt;   Sum 454 229 683</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $cut</span>
+<span class="co">#&gt; threshold.lower threshold.upper </span>
+<span class="co">#&gt;            1.92            4.00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $indices</span>
+<span class="co">#&gt;                  prevalence correct.classification.rate </span>
+<span class="co">#&gt;                   0.3231358                   0.8451243 </span>
+<span class="co">#&gt;   balance.correct.incorrect                 specificity </span>
+<span class="co">#&gt;                   5.4567901                   0.8870056 </span>
+<span class="co">#&gt;                 sensitivity   negative.predictive.value </span>
+<span class="co">#&gt;                   0.7573964                   0.8845070 </span>
+<span class="co">#&gt;   positive.predictive.value        neg.likelihood.ratio </span>
+<span class="co">#&gt;                   0.7619048                   0.2735085 </span>
+<span class="co">#&gt;        pos.likelihood.ratio                 concordance </span>
+<span class="co">#&gt;                   6.7029586                   0.8689366</span></code></pre></div>
+<p>The sensitivity for the patients who receive a decision for or against the disease has increased to .76. It was 128/228 = .56, so there is a big improvement but it is still a sensitivity that is wanting. Specificity is reduced slightly to .89, as the uncertain interval deselects 55 (TN) + 45 (FP) = 100 non-patients, for which the test score is considered as too uncertain.</p>
+<p>The function quality.threshold.uncertain provides detailed quality indices for the uncertain interval when applied to the sample. These indices show a low quality, indicating that these test scores provide very uncertain information about the true status of these patients.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dt">t2 =</span> <span class="kw">quality.threshold.uncertain</span>(psa2b<span class="op">$</span>d, psa2b<span class="op">$</span>tpsa, res[<span class="dv">1</span>], res[<span class="dv">2</span>]))
+<span class="co">#&gt; $intersection</span>
+<span class="co">#&gt; [1] 2.81317</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $table</span>
+<span class="co">#&gt;      ref</span>
+<span class="co">#&gt; diag    0  1 Sum</span>
+<span class="co">#&gt;   0    55 27  82</span>
+<span class="co">#&gt;   1    45 33  78</span>
+<span class="co">#&gt;   Sum 100 60 160</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $cut</span>
+<span class="co">#&gt; threshold.lower threshold.upper </span>
+<span class="co">#&gt;            1.92            4.00 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $X2</span>
+<span class="co">#&gt;          n  n sum    X2 df     p</span>
+<span class="co">#&gt; TN.FP   55 45 100 1.000  1 0.317</span>
+<span class="co">#&gt; FN.TP   27 33  60 0.600  1 0.439</span>
+<span class="co">#&gt; overall 82 78 160 1.127  1 0.288</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $t.test</span>
+<span class="co">#&gt;      mean.0      mean.1           t          df           p </span>
+<span class="co">#&gt;   2.7434000   2.8936667  -1.5762976 118.4397041   0.1176246 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $indices</span>
+<span class="co">#&gt;                  prevalence correct.classification.rate </span>
+<span class="co">#&gt;                   0.3750000                   0.5500000 </span>
+<span class="co">#&gt;   balance.correct.incorrect                 specificity </span>
+<span class="co">#&gt;                   1.2222222                   0.5500000 </span>
+<span class="co">#&gt;                 sensitivity   negative.predictive.value </span>
+<span class="co">#&gt;                   0.5500000                   0.6707317 </span>
+<span class="co">#&gt;   positive.predictive.value        neg.likelihood.ratio </span>
+<span class="co">#&gt;                   0.4230769                   0.8181818 </span>
+<span class="co">#&gt;        pos.likelihood.ratio        balance.with.without </span>
+<span class="co">#&gt;                   1.2222222                   0.6000000 </span>
+<span class="co">#&gt;                 concordance </span>
+<span class="co">#&gt;                   0.5740000</span></code></pre></div>
+<p>It is easy to see in figure 3, that the scores of the patients in the uncertain interval have a relatively flat distribution and can hardly be distinguished from each other. Patients form both distributions have similar or slightly lower or higher scores.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sel =<span class="st"> </span>psa2b<span class="op">$</span>tpsa <span class="op">&gt;=</span><span class="st"> </span>res[<span class="dv">1</span>] <span class="op">&amp;</span><span class="st"> </span>psa2b<span class="op">$</span>tpsa <span class="op">&lt;=</span><span class="st"> </span>res[<span class="dv">2</span>]
+<span class="kw">plotMD</span>(psa2b<span class="op">$</span>d[sel], psa2b<span class="op">$</span>tpsa[sel])</code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,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" alt="Figure 3" />
+<p class="caption">Figure 3</p>
+</div>
+<p>Table 2 shows the confusion table of the scores within the interval (using the intersection as threshold):</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">kable</span>(t2<span class="op">$</span>table, <span class="dt">caption =</span> <span class="st">&quot;Table 2&quot;</span>)</code></pre></div>
+<table>
+<caption>Table 2</caption>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">0</th>
+<th align="right">1</th>
+<th align="right">Sum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td align="right">55</td>
+<td align="right">27</td>
+<td align="right">82</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td align="right">45</td>
+<td align="right">33</td>
+<td align="right">78</td>
+</tr>
+<tr class="odd">
+<td>Sum</td>
+<td align="right">100</td>
+<td align="right">60</td>
+<td align="right">160</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="how-much-uncertainty" class="section level4">
+<h4>How much uncertainty?</h4>
+<p>The question how much uncertainty is acceptable, depends on the clinical setting. The severity of the illness, the possibilities to treat, possible side effects of the treatments and the availability of better, perhaps more expensive bio-markers are relevant parameters. All these clinical parameters influence the decision how much uncertainty is acceptable and should lead to additional testing or active surveillance while waiting for possible further development of symptoms, respectively how much certainty is necessary to make a more definitive decision for or against the presence of the disease.</p>
+<p>In the case of prostate cancer, the cancer often grows slowly and is often not causing any symptoms, while treatment with surgery or radiation has serious risks such as incontinence and impotence and does not necessarily prolongs life. Active surveillance with examinations each six months or awaiting possible changes in symptoms is often the more desirable line of action. In that case, we need a high certainty for decisive actions and might accept a wider range of test scores that we consider as diagnostically insufficient. As the PSA bio-marker is a relatively weak indicator, a wide range of test scores in the middle offers insufficient indication for treatment or no treatment. In general, a diagnostic insufficient indication can lead to the decision to use better or additional measurements that offer a better indication.</p>
+<p>A wider uncertain interval is obtained by increasing the values of specificity and sensitivity of the uncertain test scores. Higher values makes the test scores in the uncertain interval less uncertain, while the test scores outside the uncertain interval provide increased certainty, that is a increased percentage of correct decisions considering the true status of the patient. In the next code block, specificity and sensitivity is increased to respectively .60, .65 and .70.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="dt">res=</span><span class="kw">ui.nonpar</span>(psa2b<span class="op">$</span>d, psa2b<span class="op">$</span>tpsa, <span class="dt">sens=</span>.<span class="dv">60</span>, <span class="dt">spec=</span>.<span class="dv">60</span>))
+<span class="co">#&gt; Warning in ui.nonpar(psa2b$d, psa2b$tpsa, sens = 0.6, spec = 0.6): More than one point of intersection. Highest density used.</span>
+<span class="co">#&gt;         cp.l         cp.h           FN           TP           TN </span>
+<span class="co">#&gt;    1.7000000    4.6000000   35.0000000   52.0000000   77.0000000 </span>
+<span class="co">#&gt;           FP  sensitivity  specificity intersection </span>
+<span class="co">#&gt;   51.0000000    0.5977011    0.6015625    2.8131705</span>
+<span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, psa2b<span class="op">$</span>tpsa, res[<span class="dv">1</span>], res[<span class="dv">2</span>])<span class="op">$</span>indices[<span class="kw">c</span>(<span class="st">'specificity'</span>,  <span class="st">'sensitivity'</span>)]
+<span class="co">#&gt; specificity sensitivity </span>
+<span class="co">#&gt;   0.8957055   0.7676056</span>
+
+(<span class="dt">res=</span><span class="kw">ui.nonpar</span>(psa2b<span class="op">$</span>d, psa2b<span class="op">$</span>tpsa, <span class="dt">sens=</span>.<span class="dv">65</span>, <span class="dt">spec=</span>.<span class="dv">65</span>))
+<span class="co">#&gt; Warning in ui.nonpar(psa2b$d, psa2b$tpsa, sens = 0.65, spec = 0.65): More than one point of intersection. Highest density used.</span>
+<span class="co">#&gt;         cp.l         cp.h           FN           TP           TN </span>
+<span class="co">#&gt;    1.3400000    7.2400000   47.0000000   87.0000000  139.0000000 </span>
+<span class="co">#&gt;           FP  sensitivity  specificity intersection </span>
+<span class="co">#&gt;   75.0000000    0.6492537    0.6495327    2.8131705</span>
+<span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, psa2b<span class="op">$</span>tpsa, res[<span class="dv">1</span>], res[<span class="dv">2</span>])<span class="op">$</span>indices[<span class="kw">c</span>(<span class="st">'specificity'</span>,  <span class="st">'sensitivity'</span>)]
+<span class="co">#&gt; specificity sensitivity </span>
+<span class="co">#&gt;   0.9583333   0.7789474</span>
+
+(<span class="dt">res=</span><span class="kw">ui.nonpar</span>(psa2b<span class="op">$</span>d, psa2b<span class="op">$</span>tpsa, <span class="dt">sens=</span>.<span class="dv">70</span>, <span class="dt">spec=</span>.<span class="dv">70</span>))
+<span class="co">#&gt; Warning in ui.nonpar(psa2b$d, psa2b$tpsa, sens = 0.7, spec = 0.7): More than one point of intersection. Highest density used.</span>
+<span class="co">#&gt;         cp.l         cp.h           FN           TP           TN </span>
+<span class="co">#&gt;    1.1500000   16.8100000   56.0000000  131.0000000  189.0000000 </span>
+<span class="co">#&gt;           FP  sensitivity  specificity intersection </span>
+<span class="co">#&gt;   81.0000000    0.7005348    0.7000000    2.8131705</span>
+<span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, psa2b<span class="op">$</span>tpsa, res[<span class="dv">1</span>], res[<span class="dv">2</span>])<span class="op">$</span>indices[<span class="kw">c</span>(<span class="st">'specificity'</span>,  <span class="st">'sensitivity'</span>)]
+<span class="co">#&gt; specificity sensitivity </span>
+<span class="co">#&gt;   0.9782609   0.7142857</span></code></pre></div>
+<p>The function quality.threshold produces several statistics to describe the qualities of the test scores outside the uncertain interval (MCI or More Certain Intervals). Clearly, when increasing the uncertain interval, outside the uncertain interval the specificity improves faster than the sensitivity. However, in the last case, the sensitivity deteriorates for the more certain interval (MCI) outside the defined uncertain interval. The reason for this deterioration is that the number of correctly identified true patients does hardly increase, while the total number of true prostate cancer patients with scores outside the uncertain interval becomes smaller. Increasing the uncertain interval should therefore not be applied blindly.</p>
+</div>
+<div id="usage-tip" class="section level4">
+<h4>Usage tip</h4>
+<p>In the UncertainInterval package it is assumed that the test values of the patients with the targeted condition are larger than the test values of the patients without the targeted condition. When this is not the case, one can simply negate the test values by putting a minus sign before the test values. This makes the interpretation straightforward; all quality indices remain applicable. If one wants to use the non-negated test values (for instance when plotting the distributions), it is sufficient to discard the negative sign. Of course, relative comparisons, such as test score -3 &gt; -5, reverses: 3 &lt; 5.</p>
+</div>
+</div>
+<div id="using-transformations" class="section level3">
+<h3>Using transformations</h3>
+<p>When using a diagnostic test, the ultimate goal is to apply the test to new patients, other than the patients used for verification of the method. Therefore generalization is as important for any test as is its sensitivity, specificity or other validation indicators. Tests without a parametric model are optimized for the samples used, but lack a population model. Consequently, a non-parametric approach of a test necessitates considerable larger samples for validation to ensure that the quality indicators of the test results are not overly adapted to a small sample with particular characteristics.</p>
+<p>Generalization is easier when a valid parametric model can be applied, such as the bi-normal model. The advantage of a <strong>valid</strong> parametric model for the test is that we have a population model that allows for greater precision, accuracy and power. Results of a representative sample can be used to estimate population values and can be more easily generalized to other representative samples. The best results for generalization are achieved when a test is developed from the ground up with the use of a specific parametric model and a well defined population in mind.</p>
+<p>Unfortunately, this is not so often the case for medical tests. In figure 2 it is easy to see that the PSA test is not very good in identifying true patients but also not good in identifying patients without prostate cancer.</p>
+<p>Another approach of this data-set is the use of a transformation, so that a parametric method can be used. From a statistical point of view, we can ask whether a transformation of these test scores could be used to improve on the distribution. In this case, we can use the Box-Cox transformation (available in the car package) to improve the distributions (figures 4 &amp; 5).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(UncertainInterval)
+<span class="kw">library</span>(car)
+<span class="kw">data</span>(psa2b)
+p1 =<span class="st"> </span><span class="kw">powerTransform</span>(psa2b<span class="op">$</span>tpsa)
+t_tpsa =<span class="st"> </span><span class="kw">bcPower</span>(psa2b<span class="op">$</span>tpsa, p1<span class="op">$</span>roundlam)
+
+<span class="kw">qqPlot</span>(t_tpsa[psa2b<span class="op">$</span>d<span class="op">==</span><span class="dv">0</span>])
+<span class="kw">qqPlot</span>(t_tpsa[psa2b<span class="op">$</span>d<span class="op">==</span><span class="dv">1</span>])</code></pre></div>
+<div class="figure" style="text-align: center">
+<img src="data:image/png;base64,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" alt="Figures 4 &amp; 5" /><img src="data:image/png;base64,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" alt="Figures 4 &amp; 5" />
+<p class="caption">
+Figures 4 &amp; 5
+</p>
+</div>
+<p>The Box-Cox transformation limits skewness of the data by applying a power transformation. This maintains the rank order of the data, but changes its distribution. The method searches for the power transformation that results in the lowest variance. The intention of the method is to transform the data to a shape that is more similar to a normal distribution. There is no guarantee, but the two qq plots show that a reasonable approximation of normal distributions is reached.</p>
+<p>Figure 6 shows how the data are approximated using a bi-normal model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+<span class="kw">plotMD</span>(psa2b<span class="op">$</span>d, t_tpsa, <span class="dt">model=</span><span class="st">'binormal'</span>, <span class="dt">position.legend =</span> <span class="st">'topleft'</span>)
+(<span class="dt">res1=</span><span class="kw">ui.binormal</span>(psa2b<span class="op">$</span>d, t_tpsa))
+<span class="co">#&gt; Warning in nlopt.ui(Se = Se, Sp = Sp, mu0 = m0, sd0 = sd0, mu1 = m1, sd1 =</span>
+<span class="co">#&gt; sd1, : More than one point of intersection. Highest used.</span>
+<span class="co">#&gt; $status</span>
+<span class="co">#&gt; [1] 4</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $message</span>
+<span class="co">#&gt; [1] &quot;NLOPT_XTOL_REACHED: Optimization stopped because xtol_rel or xtol_abs (above) was reached.&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $intersection</span>
+<span class="co">#&gt; [1] 0.8597443</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $results</span>
+<span class="co">#&gt; exp.Sp.ui exp.Se.ui       mu0       sd0       mu1       sd1 </span>
+<span class="co">#&gt; 0.5500000 0.5500000 0.3002297 0.7219207 1.3208021 0.8378606 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $solution</span>
+<span class="co">#&gt;         L         U </span>
+<span class="co">#&gt; 0.6318927 1.0991342</span>
+<span class="kw">abline</span>(<span class="dt">v=</span>res1<span class="op">$</span>solution, <span class="dt">col=</span> <span class="st">'red'</span>)</code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,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" alt="Figure 6" />
+<p class="caption">Figure 6</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+invBoxCox &lt;-<span class="st"> </span><span class="cf">function</span>(x, lambda)
+  <span class="cf">if</span> (lambda <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">exp</span>(x) <span class="cf">else</span> (lambda<span class="op">*</span>x <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>lambda)
+<span class="kw">invBoxCox</span>(res1<span class="op">$</span>solution, p1<span class="op">$</span>roundlam)
+<span class="co">#&gt;        L        U </span>
+<span class="co">#&gt; 1.955678 3.402414</span></code></pre></div>
+<p>Of course, not all problems have disappeared; outliers are still there. The boxplot in figure 7 shows that the outliers in the lower tail are problematic: low scores &lt; -3 indicate both a patient and a non-patient. These extreme scores in the sample also influence the estimates of the bi-normal distributions somewhat.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">outlier_values &lt;-<span class="st"> </span><span class="kw">boxplot.stats</span>(t_tpsa)<span class="op">$</span>out  <span class="co"># outlier values.</span>
+inds &lt;-<span class="st"> </span><span class="kw">which</span>(t_tpsa <span class="op">%in%</span><span class="st"> </span>outlier_values)
+<span class="kw">table</span>(outlier_values, psa2b<span class="op">$</span>d[inds])
+<span class="co">#&gt;                    </span>
+<span class="co">#&gt; outlier_values      0 1</span>
+<span class="co">#&gt;   -4.88500502959075 1 0</span>
+<span class="co">#&gt;   -3.01290516092602 0 1</span>
+<span class="co">#&gt;   2.98492123652568  0 1</span>
+<span class="co">#&gt;   3.02834906992807  0 1</span>
+<span class="co">#&gt;   3.08915246880567  0 1</span>
+<span class="co">#&gt;   3.13226431569987  0 1</span>
+<span class="co">#&gt;   3.13230804246717  0 3</span>
+<span class="kw">boxplot</span>(t_tpsa, <span class="dt">main=</span><span class="st">&quot;&quot;</span>, <span class="dt">boxwex=</span><span class="fl">0.1</span>)</code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAP1BMVEUAAAAAADoAAGYAOjoAOpAAZrY6AAA6kNtmAABmtv+QOgCQ2/+2ZgC2///bkDrb////tmb/25D//7b//9v///+wvoyFAAAACXBIWXMAAA7DAAAOwwHHb6hkAAADrklEQVR4nO3c4VLTCABG0bqLWhFBS9//Wa2UMs5Ke8OYNJtw7g+GGTtf5RgSbKZs9rrYZu6/wP89QBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKBoZaLOY5gIad+64OfyrecPo6A+cZe5p8i3/3sNXR3/gLHP7l2/a0WdHf+Asc78WN6cP486O/sBZ5l4WAZ1fdATFonNQTbqK1aafg2YYBTTW5hKApghQBChaFdCCzkH3h0vul6dP/vk2wtzAlgN0/+Hrfrf9uAf0eo+3n58+3jwAerXd9unba3938/AfoLe/kvmWFgN0PIIO3X286hE0RROdg55ZdtsNoFe7P17DDscSoImfd+5RQGNtArrukwO67tx0o6sCmqLVAE31I/p6gCYaBjRwd7wHzjIHaPAgoBgEFIOAzg26zMcgoBgENGwQUAwCisGFAD3eHk8IZ16RfvdA95vn+z7fT5/81dyQFgX0cl/sQHXz8Ndzg1rUVex0Z/XQ92veWZ2i1RxBU41OdQ56PoSudw6aanSiq9hue/xGOnP8ALr23HSjgMbaXALQFAGKAEWrAnIOmmEU0FibgK775ICuOzddgCJA0aqAnINmGAU01iag6z75BF+L37wwS4AiQNGVgdw4nGluugBFgCJAEaAIUAQoAhQBitYE5NcE9qSXO2px9F1Ag2bHfOAsc3tAwyadgy5uuorNEKAIUDQp0I9PX8790fsGOr0R4cJb6t430Ok9LI6gs+22v97GAuhCdx++ArrY/eYzoIv9+PTvH0DurP7e4+3GEXSp3966OsbcPAGKAEWAIkCR/81HawLyimJPek26Ft3ViEVAsQjo8qRz0MVNV7EZmg1oMc0EtL4ARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYoARYAiQBGgCFAEKAIUAYp+AiuODb0RwFZjAAAAAElFTkSuQmCC" alt="Figure 7" />
+<p class="caption">Figure 7</p>
+</div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># mtext(paste(&quot;Outliers: &quot;, paste(round(outlier_values, 2), collapse=&quot;, &quot;)), # cex=0.6)</span></code></pre></div>
+<p>Leaving out these extreme values may improve the estimates.</p>
+<p>Note: the exercises here are intended as <strong>illustrations</strong> how the UncertainInterval package can be used in the case of a test with a difficult distribution. The PSA test is not developed with this transformation or the bi-normal model in mind. Whether this transformation is the best way to deal specifically with PSA test scores would require additional research to ascertain that the transformation has more general validity. Furthermore, there is considerable discussion about the usefulness of PSA scores for early identification of prostate cancer. Some researchers have argued that the PSA test may have better predictive value for specific age subpopulations (Sadi, 2017).</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">sel=t_tpsa <span class="op">&gt;</span><span class="st"> </span><span class="op">-</span><span class="dv">3</span>
+<span class="kw">plotMD</span>(psa2b<span class="op">$</span>d[sel], t_tpsa[sel], <span class="dt">model=</span><span class="st">'binormal'</span>)
+(<span class="dt">res55=</span><span class="kw">ui.binormal</span>(psa2b<span class="op">$</span>d[sel], t_tpsa[sel]))
+<span class="co">#&gt; Warning in nlopt.ui(Se = Se, Sp = Sp, mu0 = m0, sd0 = sd0, mu1 = m1, sd1 =</span>
+<span class="co">#&gt; sd1, : More than one point of intersection. Highest used.</span>
+<span class="co">#&gt; $status</span>
+<span class="co">#&gt; [1] 4</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $message</span>
+<span class="co">#&gt; [1] &quot;NLOPT_XTOL_REACHED: Optimization stopped because xtol_rel or xtol_abs (above) was reached.&quot;</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $intersection</span>
+<span class="co">#&gt; [1] 0.8641356</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $results</span>
+<span class="co">#&gt; exp.Sp.ui exp.Se.ui       mu0       sd0       mu1       sd1 </span>
+<span class="co">#&gt; 0.5500000 0.5500000 0.3116761 0.6802260 1.3398096 0.7886725 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $solution</span>
+<span class="co">#&gt;         L         U </span>
+<span class="co">#&gt; 0.6625423 1.0749633</span>
+<span class="kw">abline</span>(<span class="dt">v=</span>res55<span class="op">$</span>solution, <span class="dt">col=</span> <span class="st">'red'</span>)</code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAq1BMVEUAAAAAADoAAGYAAP8AOjoAOpAAZmYAZpAAZrY6AAA6ADo6AGY6OgA6Ojo6OmY6OpA6ZmY6kLY6kNtmAABmADpmAGZmOgBmZgBmZmZmtv+QOgCQOjqQZgCQkGaQtpCQ29uQ2/+2ZgC2Zjq2Zma225C2/9u2//+/a6u/j8+/v//Pj7/bkDrbtrbb2//b/7bb/9vb////AAD/j4//tmb/v7//25D//7b//9v////LKyUgAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAON0lEQVR4nO2di3brOBWG3YqBlNuBdIBJhzNTA3MgMTBHOG39/k+GrrZsS9qSLNlOu/+12jiJpERftu5bctWhvKq2/gJ7FwIChIAAISBACAgQAgKEgAAhIEAICBACAoSAACEgQAgIEAIChIAAISBACAgQAgKEgAAhIEAICBACAoSAACEgQAgIEAIChIAAISBACAgQAgKEgAAhIEAFATVVVd1/YRevj+zq1L09Vd989UepZQQVmQuKoaTT/vuXkI+JUWFAd8/soq3SAfGIAZJpvz7e3xigXzwc+cXdbwPzaQMkGIdpiJ5PZQH98vHALur7v/QW9PLAf192KbJSMwAHGbrmKExAfek8dGbIRgRT2BpdCkXaPEx1/5OyoCHtJqKszlQW0K+eWDZfH7/561DEGn7ZCosSdZOsp9h7Vf9ERpZXLIwoO/2bjWFYTR9nBmgeI9G4ygI61iwfLw/HZgDE//9X5FqWCJaTo6imDuJHnwKSF0bIRoThafMXDiLqUaVd96yMGEaoFBUG1DIwTXUyADFe1e/E7y8zbBDgr1gA3T2bIUVSPJED/6eDTwEZMYxQKSoM6OXh0DErMgGJyoF/e/bNdWlhb6maxgrICCmed9IsVLnkaU0BjdPWoVJUGBCrf35m9dAIEPvyQ+svMyGLgROQEdIEpCuaPu0BkBljCJWisoBOb093PzyI79sDEr+oKmv6Ow/GNQUk2jsj5AhQ17dQFgs6jb9KajtWGBD7zt+xrJiAWA4/C4vvM9l1zjqI0zyMQpqA3r5/VnEtdVAfYwiVkovSgJqqb9ZlJnj1yq54Lmv+qmzHLa2Y2VE0QhqA+j6VtiDxnmalYxihUnJRGpCscAZAsosoGiFdOdzJH3jaD9LiRcUIaVpQ0yOU+W9n/SCjtxTRIzdVFJCsISWQU1978vZE/MBDdSRfqU7OweoQclQHicZKdTRlz6q6+3FS1RmhUoTTHYAQECAEBAgBAUJAgBAQIAQECAEBQkCAEBAgBAQIAQFCQIAQECAEBAgBAUJAgBAQIAQECAEBQkCAEBAgBAQIAQFCQIAQECAEBAgBAUJAgBAQIAQEaP+AqPhfmU/WVB5AvTtYAd7vAlCp5LgQECAEBAgBDTpLjV+8KUC19Fh1u9R+cECCz6+FF65j48PHBvT6eGSQ5L4/h9v6RwfEvcHFvqLW4Zf9sQEJ62nQgtzi266FCbWuWvqDA+o3wR1c768C6Hq1xtZbqfPqFvtBDNC/mKZBWQVQO3+5ZL0fQK/fPncvv9nLwQLNlq2YHRCHwyFl1q6mO94voEzJISBAGhBh6l+8KUD6iA1nc5oDkKAzIApt5vdQSTf6/ILWdZBBBkCajH60ARKaxt6+mVfjMK5iQw1CWLk5m6SCARm77jMqdrCqVGywSs49IEUoGFAZ7cyCyNkAJEvZDQHiB93Ii1J1EDmPAHW3Bqg/SMV5ysMyQGQKiBO6KUCFkyPnGSCCgAaR8wxQZwcUkejSrtHeAXXECuifTLw3DSf6jgCRbteAzCOJMiSXIDsgexGzARIn8XAeb08ndejM7/98/w/2QismQd++/+yZCw3IET+RJvEotBzTHaRzACLG9xSAqNYIEO/Gtvc/PZ26l08/s/8NP1vpxC1IvMNPe7v/Ilau4rI2eraAkS25KIUColRbECNkxFej+ebQNUd1zRc5VRFjz5hh6UWZBTlqfGP1+OTCxTE4ihjpDECUGkWMGqscrTiI68TM53t5rqAsb+LvQZ4XeJKh0nPUqiP30k/TLQ6IEzHqIIOQng/62w+fviqzUYC4IWWwIN5LlmRcI9Go5CIlypGrkibuftBASNZBX8QwiLPgZCQg/mrNLYifjhd7mqLRiiWegmZPLkxmh7ALAETnPemBkDrA8vVP8sDBu2dtQXya749Pp7en7xJq2AGQmq1cYD5dKqDpKH4GiMiEqW2oYdZDXokiFq0ZINeCTmRyYQoE1ElA1D4WWwVQPfRk1mzmNZDJKH4K6Equ1fVKp4D0YyChTBa0TIUAXUkl+NgBFXVp2HYspkBMpznsgK6dE1BBQjcDiAoiVIIZUpB1UXFAbIiiJwuXrQwkAZpNc4we6ZlTmAD6H9OV/SlAilCBZbFdWFAQoKsfECckbquRWzcCiFbEC4ibUFP9oagF8ZmAJv3+E9PkgiT52MGYgCgIiBH699eyRazm8yeJq7ep80HBgFgRIwAgWrgOEmO96rT+UIM4wBiAqB+QbO3XAMQ96VcfaoQAulyqCxuQeQExQoWL2OH1kc8HLJqZjgdEXGAGQIwPA3Qhrn7QSoDEDMHb07KZ+5UAjXvS/ZhsJ/2gNt9unyBAtJOALgQCRDcHVPO70Xz6mm23z9jdZSmgIiOOIUege53oCfC5yy6b+0sQoLMG1JFNAdVg8yXsRuwXy+VA5ZgoMx9pBKAShIxmHpwpk0He/tPls6BIQBdeX/sA5Sc06gdB6vtITprZAVGziF0IAKiACfU5CmrgG9l8tc5bUUUCcswkDo80ElB+QkOO3LlOSi5IMKBRJX2BilhJQJtMmAGAOjVPHwEoO6HE+aA8u31cU636UfCgFxMQuRFA01TSpjsgQJxPLKDchIwciduV1YuWxeJ464mgzIDyEjIq6bvnho/m11s4hAAJPhNAFwIBymxCRjN/FN0/73xQ1t0+pCsEKCuhUUeRA/LNKObd7QMBEoPUGSAx6+EFlNeEZhZUu2ft8+7VIAAgmgwoK6FpHdR4uot5d/sMLmW+UfwcEJ/12ASQ7Cr6vKgyW1DnBUTP6YByEtpst4/hUpYbEPeUybaVY7PdPjZAWqIGcgLqCAjoWgCQzPuyddUIQHK75QTQRUpOcywCJJ1lckjnqJalp1nmYJYNED17AF3J+oD682649/7y5ECpHc3lAF1z1dMyR8Zs2bKd1ZkA0bMXkCTk7A9JQJkI9Q5U+oVVlp71oQEOQDQDoFwmpAGBXUB/KpHTHRAg9bYbEAkAlIdQHkCT5CD1B3PYAVENygnoGgAoU29xh4BoAKArgQHlIbQFoOFkFzugLhegHIQ0oKEW2RoQvYQAkv5UfkBZTGgDJ86Bjw0QzQgoB6H1AZHZ3ssxoEsYoKt7XsgAtJzQBoA6HyB6CQbkHNUbD8sHrTsDRMMBXYkO5gG0fEy2OiDL1kJjoZBeIgCREEBDIdNv585R3uSIH9AlAlAXAsggdCOAxH8HIHoJAtS/TQIAXW8KkH3n3HgdLAYQCQDUt/W3AGh6gtLogUYDugQB0oRuABCxeyuMFwpjAAlCICBFaEtAgdMdjn1P43WwKEAXtzOD8ZTSMbCorKVTiU7Ota1nvMwTCci5Vm8+pfQWABEfoGEVIw6Q25lh9JQR2j2g+RhsAESNSfpIQM61+tkU9c4BEdvxLuphNAcdC8i10jqbgV0DULp/kK0HPbTv5yWAHAuJU8PShKIyHL02n+ofRGw96N7P5bwMkH2dbF7yJKKYDHtyZFO6dwcZrYONFuP5WGkpIOsqh6Vqks19nGIAxfsHqZxPJumn8xvLAQlCMCBGKHr6o6wFSTzTOWhjdCqnN5YDuhIybc3sjRuNnWQs6x8k8JCRX4suWp047u+SC9B8htE1IxuJqKx/kMBzngPi+abaCXExIP1ISAgg8cOUAhSanK577KP3szgqcshaLkC8nPG6aGRYVieQCETFAIlbP1haLXmO5ihrfeylgGRd5J9oXKkn7d3MQoTmlqMOGJ1lzZnjBECcgPz8bQFNUxlNd1CXktJOvL8YARSaTuYiVkC3dQO2DXRTgAL21mfXLQGCB6sFdEOAAoYa/s9KEnU+SVDCl44Iu9iTcel3KZ7AwiiLLWjpd9k7oIDB6qLPun1A8GB10We9A0DLhIAWfhYCWvg+Ato8gTxRkoWA3qMQECAEBAgBAUJAgBAQIAQECAEBQkCAEBAgBAQIAQFCQIDWBeQ5dN53EDwcW61pemfKG/gTLFoVkOfmO/z4mdb//b237nl7YpEb3414uUMK8Ak2rQmoda9ZyxUl78kzntidPtbHczKLOL8l4aYPKwJqq6NzvRHMnzf2EAiwkH0D6jwLsv6T8qHYvaBz+Zt9FzFPFuVPDxgACAhYz2xT7nD5ngC14M3SE+7SvBNAOYpYyHp4fDO2CqD+Lu0LKmlfbPUhAeUn/gy7nVhQQDMPAPIdQssl0cS77ewEUEhH0Zu7lwfIfmpxP/r0m2GvIk8WAwYC/qOuhXxJ8Ns1xx8SiYNVQAgIEAIChIAAISBACAgQAgKEgAAhIEAICBACAoSAACEgQAgIEAIChIAAISBACAgQAgKEgAAhIEAICBACAoSAACEgQAgIEAICtC6g/iZLllX2Vq6ba1/fWgZ0+Hu0d8/GUSt95AJa34Kkr9RMOr89IOEL9vpodwmbOIKMYOXVzgG5XGI+AiDtdvbywN1S+H+BZALo5eH0+u1nXiR7NzXuKPNZFzH+6kFFbmUIFT6TNgPEPXK515Pw/Gqrk9uCZDHT4YWrb1spQPzV18ejuGaJsOuDs1imaStA8sal7f0X7RXlqoMOMmgfXrrS1RKQvv0pv5beYwJozgPWtgIkKxFegNQOjBkg2Yod1Tt9eAlUtWLaJ3O4FinmrJA2A6Ta+5PcpnNyVdKdBqTDNyNAqj4bALGrdwJo1AzVQ7fGBUiH/ygWNM6F8bs7APXhlUe1tw56D4DkvhJmOcI0jKrVAagPLy5Grdjb00FEHlqxdwFI9GB4cWmV925t7Qd1vfHo8JZ+kIrcGpV6Nu1usOrdd7mBEBAgBARod4D2JgQECAEBQkCAEBAgBAQIAQFCQIAQECAEBAgBAUJAgBAQIAQECAEBQkCAEBAgBAQIAQFCQIAQEKD/A+DopK2q7eOIAAAAAElFTkSuQmCC" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">
+invBoxCox &lt;-<span class="st"> </span><span class="cf">function</span>(x, lambda)
+  <span class="cf">if</span> (lambda <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">exp</span>(x) <span class="cf">else</span> (lambda<span class="op">*</span>x <span class="op">+</span><span class="st"> </span><span class="dv">1</span>)<span class="op">^</span>(<span class="dv">1</span><span class="op">/</span>lambda)
+<span class="kw">invBoxCox</span>(res55<span class="op">$</span>solution, p1<span class="op">$</span>roundlam)
+<span class="co">#&gt;        L        U </span>
+<span class="co">#&gt; 2.024697 3.301731</span></code></pre></div>
+<p>Of course, a wider range of test scores can be considered as diagnostically uncertain. In the next block we compare higher values for sensitivity and specificity of the uncertain test scores and show the obtained results for the outer, more certain regions:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res60=<span class="kw">ui.binormal</span>(psa2b<span class="op">$</span>d[sel], t_tpsa[sel], <span class="dt">Se=</span>.<span class="dv">60</span>, <span class="dt">Sp=</span>.<span class="dv">60</span>)
+<span class="co">#&gt; Warning in nlopt.ui(Se = Se, Sp = Sp, mu0 = m0, sd0 = sd0, mu1 = m1, sd1 =</span>
+<span class="co">#&gt; sd1, : More than one point of intersection. Highest used.</span>
+res60<span class="op">$</span>results
+<span class="co">#&gt; exp.Sp.ui exp.Se.ui       mu0       sd0       mu1       sd1 </span>
+<span class="co">#&gt; 0.6000000 0.6000000 0.3116761 0.6802260 1.3398096 0.7886725</span>
+<span class="kw">quality.threshold.uncertain</span>(psa2b<span class="op">$</span>d, t_tpsa, res60<span class="op">$</span>solution[<span class="dv">1</span>], res60<span class="op">$</span>solution[<span class="dv">2</span>])<span class="op">$</span>indices[<span class="kw">c</span>(<span class="st">'specificity'</span>,  <span class="st">'sensitivity'</span>)]
+<span class="co">#&gt; specificity sensitivity </span>
+<span class="co">#&gt;   0.4927536   0.7142857</span>
+<span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, t_tpsa, res60<span class="op">$</span>solution[<span class="dv">1</span>], res60<span class="op">$</span>solution[<span class="dv">2</span>])<span class="op">$</span>indices[<span class="kw">c</span>(<span class="st">'specificity'</span>,  <span class="st">'sensitivity'</span>)]
+<span class="co">#&gt; specificity sensitivity </span>
+<span class="co">#&gt;   0.8860759   0.7793103</span>
+
+res65=<span class="kw">ui.binormal</span>(psa2b<span class="op">$</span>d[sel], t_tpsa[sel], <span class="dt">Se=</span>.<span class="dv">65</span>, <span class="dt">Sp=</span>.<span class="dv">65</span>)
+<span class="co">#&gt; Warning in nlopt.ui(Se = Se, Sp = Sp, mu0 = m0, sd0 = sd0, mu1 = m1, sd1 =</span>
+<span class="co">#&gt; sd1, : More than one point of intersection. Highest used.</span>
+res65<span class="op">$</span>results
+<span class="co">#&gt; exp.Sp.ui exp.Se.ui       mu0       sd0       mu1       sd1 </span>
+<span class="co">#&gt; 0.6500000 0.6500000 0.3116761 0.6802260 1.3398096 0.7886725</span>
+<span class="kw">quality.threshold.uncertain</span>(psa2b<span class="op">$</span>d, t_tpsa, res65<span class="op">$</span>solution[<span class="dv">1</span>], res65<span class="op">$</span>solution[<span class="dv">2</span>])<span class="op">$</span>indices[<span class="kw">c</span>(<span class="st">'specificity'</span>,  <span class="st">'sensitivity'</span>)]
+<span class="co">#&gt; specificity sensitivity </span>
+<span class="co">#&gt;   0.5779817   0.7307692</span>
+<span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, t_tpsa, res65<span class="op">$</span>solution[<span class="dv">1</span>], res65<span class="op">$</span>solution[<span class="dv">2</span>])<span class="op">$</span>indices[<span class="kw">c</span>(<span class="st">'specificity'</span>,  <span class="st">'sensitivity'</span>)]
+<span class="co">#&gt; specificity sensitivity </span>
+<span class="co">#&gt;   0.9406780   0.7878788</span>
+
+res70=<span class="kw">ui.binormal</span>(psa2b<span class="op">$</span>d[sel], t_tpsa[sel], <span class="dt">Se=</span>.<span class="dv">70</span>, <span class="dt">Sp=</span>.<span class="dv">70</span>)
+<span class="co">#&gt; Warning in nlopt.ui(Se = Se, Sp = Sp, mu0 = m0, sd0 = sd0, mu1 = m1, sd1 =</span>
+<span class="co">#&gt; sd1, : More than one point of intersection. Highest used.</span>
+res70<span class="op">$</span>results
+<span class="co">#&gt; exp.Sp.ui exp.Se.ui       mu0       sd0       mu1       sd1 </span>
+<span class="co">#&gt; 0.7000000 0.7000000 0.3116761 0.6802260 1.3398096 0.7886725</span>
+<span class="kw">quality.threshold.uncertain</span>(psa2b<span class="op">$</span>d, t_tpsa, res70<span class="op">$</span>solution[<span class="dv">1</span>], res70<span class="op">$</span>solution[<span class="dv">2</span>])<span class="op">$</span>indices[<span class="kw">c</span>(<span class="st">'specificity'</span>,  <span class="st">'sensitivity'</span>)]
+<span class="co">#&gt; specificity sensitivity </span>
+<span class="co">#&gt;   0.6655738   0.7303371</span>
+<span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, t_tpsa, res70<span class="op">$</span>solution[<span class="dv">1</span>], res70<span class="op">$</span>solution[<span class="dv">2</span>])<span class="op">$</span>indices[<span class="kw">c</span>(<span class="st">'specificity'</span>,  <span class="st">'sensitivity'</span>)]
+<span class="co">#&gt; specificity sensitivity </span>
+<span class="co">#&gt;   0.9731544   0.8431373</span></code></pre></div>
+<p>The statistics estimated for the uncertain interval of the <strong>modeled distribution</strong> are exactly what we asked for: sensitivity and specificity are respectively .60, .65 and .70. These estimates are no longer solely based on the sample and the values in the sample deviate, as can be expected. In the last example, with sensitivity and specificity set to .7, the sample values are respectively .67 and .73. When the bi-normal model is valid for these test scores, the bi-normal estimates of .7 can be considered as better, but this requires additional prove.</p>
+<p>The obtained <strong>sample</strong> values for the outer regions show systematic improvements when sensitivity and specificity for the uncertain test scores are higher. These sample values are provided by the quality.threshold function. In the last case, specificity has increased to .97 while sensitivity has increased to .84.</p>
+<p>A further question is how many patients are considered as having an uncertain test result, when using these values for sensitivity and specificity for determination of the uncertain interval. The extended confusion tables are produced by the quality.threshold function. The diagnoses based on the uncertain test scores are labeled as NA:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, t_tpsa, res55<span class="op">$</span>solution[<span class="dv">1</span>], res55<span class="op">$</span>solution[<span class="dv">2</span>])<span class="op">$</span>table
+<span class="co">#&gt;      ref</span>
+<span class="co">#&gt; diag    0   1 Sum</span>
+<span class="co">#&gt;   0   320  43 363</span>
+<span class="co">#&gt;   NA   74  42 116</span>
+<span class="co">#&gt;   1    60 144 204</span>
+<span class="co">#&gt;   Sum 454 229 683</span>
+<span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, t_tpsa, res60<span class="op">$</span>solution[<span class="dv">1</span>], res60<span class="op">$</span>solution[<span class="dv">2</span>])<span class="op">$</span>table
+<span class="co">#&gt;      ref</span>
+<span class="co">#&gt; diag    0   1 Sum</span>
+<span class="co">#&gt;   0   280  32 312</span>
+<span class="co">#&gt;   NA  138  84 222</span>
+<span class="co">#&gt;   1    36 113 149</span>
+<span class="co">#&gt;   Sum 454 229 683</span>
+<span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, t_tpsa, res65<span class="op">$</span>solution[<span class="dv">1</span>], res65<span class="op">$</span>solution[<span class="dv">2</span>])<span class="op">$</span>table
+<span class="co">#&gt;      ref</span>
+<span class="co">#&gt; diag    0   1 Sum</span>
+<span class="co">#&gt;   0   222  21 243</span>
+<span class="co">#&gt;   NA  218 130 348</span>
+<span class="co">#&gt;   1    14  78  92</span>
+<span class="co">#&gt;   Sum 454 229 683</span>
+<span class="kw">quality.threshold</span>(psa2b<span class="op">$</span>d, t_tpsa, res70<span class="op">$</span>solution[<span class="dv">1</span>], res70<span class="op">$</span>solution[<span class="dv">2</span>])<span class="op">$</span>table
+<span class="co">#&gt;      ref</span>
+<span class="co">#&gt; diag    0   1 Sum</span>
+<span class="co">#&gt;   0   145   8 153</span>
+<span class="co">#&gt;   NA  305 178 483</span>
+<span class="co">#&gt;   1     4  43  47</span>
+<span class="co">#&gt;   Sum 454 229 683</span>
+
+res70<span class="op">$</span>solution
+<span class="co">#&gt;            L            U </span>
+<span class="co">#&gt; -0.008275071  2.028532093</span>
+<span class="kw">invBoxCox</span>(res70<span class="op">$</span>solution, p1<span class="op">$</span>roundlam)
+<span class="co">#&gt;          L          U </span>
+<span class="co">#&gt;  0.9917652 12.4656935</span></code></pre></div>
+<p>When applying the last results, 483 patients of the sample have a test score that is considered as uncertain (with PSA scores between .99 and 12.5) and should be monitored, 153 patients would receive a decision that the likelihood of having prostate cancer is very low (with 8 errors), and 47 patients would receive a decision for immediate further diagnostics and possible treatment of their prostate cancer (with 4 errors). Clearly, patients with test scores within the uncertain interval should receive more frequent active surveillance when their PSA score is higher.</p>
+<p>The PSA test is a weak bio-marker. A better predictive result is possible when using a better test and/or by integrating additional relevant information. A better predictive result would result in a smaller group for monitoring and a lower number of errors.</p>
+</div>
+</div>
+<div id="short-interval-scales" class="section level2">
+<h2>Short interval scales</h2>
+<p>Up to now we have discussed the uncertain interval method for scales on a continuous scale. Many medical tests have only a limited number of discrete values that can be roughly ordered from ‘good’ to ‘bad’. In other words, these scales are on an interval level and are short in the sense that they have a limited and low number of discrete values.</p>
+<p>As there are only a few discrete values, an uncertain interval would only cover a single or a few different test scores. For a single test score, it is not possible to define a threshold (intersection) which would allow for the definition of sensitivity and specificity of the uncertain test scores. When just a few scores are considered as uncertain, sensitivity or specificity of these uncertain test scores can wildly deviate from the desired values. In other words, the methods presented above cannot be applied.</p>
+<p>One approach to the problem is simple visual inspection, the other is applying the ui.ordinal function which uses other criteria than sensitivity and specificity for the determination of an uncertain interval.</p>
+<div id="visual-inspection" class="section level3">
+<h3>Visual inspection</h3>
+<p>For visual inspection, the PlotMD function can display an exact representation of the sampled data with a limited number of discrete values when model = ‘ordinal’ is used. The data of Tosteson &amp; Begg (1988) illustrate this. There are 63 patients without cancer and 33 patients who have cancer (in this case either breast cancer or colon cancer). These patients have received a score of 1 to 5, indicating the presence of metastatic disease to the liver. A liver metastasis is a malignant tumor in the liver that has spread from another organ that has been affected by cancer.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;tostbegg2&quot;</span>)
+sel =<span class="st"> </span>tostbegg2<span class="op">$</span>type<span class="op">==</span><span class="dv">0</span>
+<span class="kw">plotMD</span>(<span class="dt">ref=</span>tostbegg2<span class="op">$</span>d, <span class="dt">test=</span>tostbegg2<span class="op">$</span>y, <span class="dt">model=</span><span class="st">'ordinal'</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Visual inspection learns us that the score 3 is the most uncertain indicator. The radiologists used this to indicate the possibility of metastatic disease to the liver. This score is the most uncertain and is best used as an indication that further data collection is necessary. But it is also clear that all the scores provide some uncertainty concerning a decision for or against the presence of metastatic cancer.</p>
+</div>
+<div id="using-the-ui.ordinal-function" class="section level3">
+<h3>Using the ui.ordinal function</h3>
+<p>It should be clear that when using this few scores, all quality indices concern the limited score values and cannot be very precise. However, it is possible to calculate an interval of uncertain test scores, using a loss function. The documentation of this function provides the details. The function ui.ordinal provides additional information about possible choices for the uncertain interval:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ui.ordinal</span>(<span class="dt">ref=</span>tostbegg2<span class="op">$</span>d, <span class="dt">test=</span>tostbegg2<span class="op">$</span>y, <span class="dt">return.all=</span><span class="ot">TRUE</span>)
+<span class="co">#&gt; Warning in ui.ordinal(ref = tostbegg2$d, test = tostbegg2$y, return.all = TRUE): No solution found for the ui ratio constraints.</span>
+<span class="co">#&gt; $Youden</span>
+<span class="co">#&gt; max.Youden  threshold         Sp         Se        Acc       Loss </span>
+<span class="co">#&gt;  0.6305916  3.0000000  0.8730159  0.7575758  0.8333333  0.3694084 </span>
+<span class="co">#&gt;          C </span>
+<span class="co">#&gt;  0.8376623 </span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $data.table</span>
+<span class="co">#&gt;   test d0 d1 tot TP FP TN FN       tpr        fpr         Y</span>
+<span class="co">#&gt; 1    1 33  5  38 33 63  0  0 1.0000000 1.00000000 0.0000000</span>
+<span class="co">#&gt; 2    2 22  3  25 28 30 33  5 0.8484848 0.47619048 0.3722944</span>
+<span class="co">#&gt; 3    3  4  3   7 25  8 55  8 0.7575758 0.12698413 0.6305916</span>
+<span class="co">#&gt; 4    4  2  4   6 22  4 59 11 0.6666667 0.06349206 0.6031746</span>
+<span class="co">#&gt; 5    5  2 18  20 18  2 61 15 0.5454545 0.03174603 0.5137085</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $intersection</span>
+<span class="co">#&gt; [1] 3</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $uncertain.interval</span>
+<span class="co">#&gt;   lowerbound upperbound     UI.Sp     UI.Se    UI.Acc  UI.ratio      UI.C</span>
+<span class="co">#&gt; 1          3          3 0.0000000 1.0000000 0.4285714 1.4318182 0.5000000</span>
+<span class="co">#&gt; 2          2          3 0.8461538 0.5000000 0.7812500 0.4405594 0.6730769</span>
+<span class="co">#&gt; 3          1          3 0.9322034 0.2727273 0.8285714 0.3559322 0.5939908</span>
+<span class="co">#&gt; 4          3          4 0.0000000 1.0000000 0.5384615 2.2272727 0.6190476</span>
+<span class="co">#&gt; 5          2          4 0.7857143 0.7000000 0.7631579 0.6818182 0.7607143</span>
+<span class="co">#&gt; 6          1          4 0.9016393 0.4666667 0.8157895 0.4694486 0.6836066</span>
+<span class="co">#&gt; 7          3          5 0.0000000 1.0000000 0.7575758 5.9659091 0.7600000</span>
+<span class="co">#&gt; 8          2          5 0.7333333 0.8928571 0.8103448 1.7818182 0.8750000</span>
+<span class="co">#&gt; 9          1          5 0.8730159 0.7575758 0.8333333 1.0000000 0.8376623</span>
+<span class="co">#&gt;   UI.n    MCI.Sp    MCI.Se   MCI.Acc     MCI.C MCI.n      Loss</span>
+<span class="co">#&gt; 1    7 0.9322034 0.7333333 0.8651685 0.8375706    89 0.3333333</span>
+<span class="co">#&gt; 2   32 0.8918919 0.8148148 0.8593750 0.8673674    64 0.5007215</span>
+<span class="co">#&gt; 3   70 0.0000000 1.0000000 0.8461538 0.6590909    26 0.7215007</span>
+<span class="co">#&gt; 4   13 0.9649123 0.6923077 0.8795181 0.8248988    83 0.3910534</span>
+<span class="co">#&gt; 5   38 0.9428571 0.7826087 0.8793103 0.8627329    58 0.5584416</span>
+<span class="co">#&gt; 6   76 0.0000000 1.0000000 0.9000000 0.5000000    20 0.7792208</span>
+<span class="co">#&gt; 7   33 1.0000000 0.0000000 0.8730159 0.4875000    63 0.8730159</span>
+<span class="co">#&gt; 8   58 1.0000000 0.0000000 0.8684211 0.5000000    38 1.0404040</span>
+<span class="co">#&gt; 9   96       NaN       NaN       NaN        NA     0 1.2611833</span>
+<span class="co">#&gt; </span>
+<span class="co">#&gt; $candidates</span>
+<span class="co">#&gt;   lowerbound upperbound UI.Sp UI.Se    UI.Acc UI.ratio UI.C UI.n    MCI.Sp</span>
+<span class="co">#&gt; 1          3          3     0     1 0.4285714 1.431818  0.5    7 0.9322034</span>
+<span class="co">#&gt;      MCI.Se   MCI.Acc     MCI.C MCI.n      Loss</span>
+<span class="co">#&gt; 1 0.7333333 0.8651685 0.8375706    89 0.3333333</span></code></pre></div>
+<p>The warning indicates that no solution is found for the given (default) ratio constraints (lower ratio .8, upper ratio 1,25). These ratio’s limit the ratio of patients with the disease and without the disease within the uncertain interval between .8 and 1.25. The selected candidate is the same as was chosen on the basis of visual inspection. The ui.ordinal function provides directly several quality indices for both possible uncertain intervals and for the test scores outside the uncertain interval (MCI’s).</p>
+</div>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Etzioni R, Pepe M, Longton G, Hu C, Goodman G (1999). Incorporating the time dimension in receiver operating characteristic curves: A case study of prostate cancer. Medical Decision Making 19:242-51.</p>
+<p>Landsheer, JA (2016). Interval of Uncertainty: An Alternative Approach for the Determination of Decision Thresholds, with an Illustrative Application for the Prediction of Prostate Cancer. PloS One, 11(11), e0166007.</p>
+<p>Sadi, M. V. (2017). PSA screening for prostate cancer. Revista Da Associação Médica Brasileira, 63(8), 722–725.</p>
+<p>Tosteson AN, Begg CB (1988). A general regression methodology for ROC curve estimation. Medical Decision Making 8:204-15.</p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

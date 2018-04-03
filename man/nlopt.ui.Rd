@@ -61,4 +61,5 @@ Only a single intersection is assumed (or an second intersection where the overl
 nlopt.ui()
 # Using another bi-normal distribution:
 nlopt.ui(mu0=0, sd0=1, mu1=1.6, sd1=2)
+
 }

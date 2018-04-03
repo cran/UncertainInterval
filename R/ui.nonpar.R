@@ -103,7 +103,7 @@ ui.nonpar <-
       intersection = get.intersection(df$ref, df$test, model='kernel')
       if (length(intersection) > 1) {
         intersection = utils::tail(intersection, n = 1)
-        warning('More than one point of intersection. Highest density used.')
+        warning('More than one point of intersection. Highest density used. \n')
       } else intersection=intersection[1] # other values are ignored
     }
 
