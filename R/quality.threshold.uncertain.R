@@ -1,43 +1,104 @@
 #' Function for the description of the qualities of the Uncertain Interval.
 #' @name quality.threshold.uncertain
-#' @description This function can be used only for trichotomization (double thresholds or cut-points) methods. In the case of the Uncertain Interval trichotomization method, it provides descriptive statistics for the test scores within the Uncertain Interval. For the TG-ROC trichotomization method it provides the descriptive statistics for TG-ROC's Intermediate Range.
-#' @param ref The reference standard. A column in a data frame or a vector indicating the classification by the reference test. The reference standard must be coded either as 0 (absence of the condition) or 1 (presence of the condition)
-#' @param test The index test or test under evaluation. A column in a dataset or vector indicating the test results in a continuous scale.
+#' @description This function can be used only for trichotomization (double
+#'   thresholds or cut-points) methods. In the case of the Uncertain Interval
+#'   trichotomization method, it provides descriptive statistics for the test
+#'   scores within the Uncertain Interval. For the TG-ROC trichotomization
+#'   method it provides the descriptive statistics for TG-ROC's Intermediate
+#'   Range.
+#' @param ref The reference standard. A column in a data frame or a vector
+#'   indicating the classification by the reference test. The reference standard
+#'   must be coded either as 0 (absence of the condition) or 1 (presence of the
+#'   condition)
+#' @param test The index test or test under evaluation. A column in a dataset or
+#'   vector indicating the test results in a continuous scale.
 #' @param threshold The lower decision threshold of a trichotomization method.
-#' @param threshold.upper The upper decision threshold of a trichotomization method. When NULL, the test scores are dichotomized.
-#' @param intersection (default = NULL). When NULL, the intersection is calculated with \code{get.intersection}, which uses the kernel density method to obtain the intersection. When another value is assigned to this parameter, this value is used instead.
-#' @param model (default = 'kernel'). The model used defines the intersection. Default the kernel densities are used with adjust = 1, for ordinal models adjust = 2 is used. For binormal models the binormal estimate of the intersection is used. The model defines the intersection, which defines the output of this function.
-#' @return{ A list of}
-#' \describe{
-#'   \item{intersection}{The value used as estimate of the intersection. NOTE: The trichotomization method TG-ROC has no defined position for its Intermediate Range, but usage of the point where Sensitivity=Specificity seems a reasonable choice.}
-#'   \item{table}{The confusion table of {diag x ref} for the Uncertain Interval where the scores are expected to be inconclusive, where diag is the diagnosis based on the test, when applying the thresholds. Both the reference standard (ref) and the diagnosis based on the test scores (diag) have categories 0 and 1. In the case of the Uncertain Interval trichotomization method, the row NA shows the count of test scores within the Uncertain Interval. When applying the trichotomization method TG-ROC, the row NA shows the count of the test scores within the Intermediate Range. Table cell {0, 0} shows the True Negatives (TN), cell {0, 1} shows the False Negatives (FN), cell {1, 0} shows the False Positives (FP), and cell {1, 1} shows the True Positives (TP).}
-#'   \item{cut}{The values of the thresholds.}
-#'   \item{X2}{Table with the outcomes of three Chi-square tests of the confusion table:}
-#'     \itemize{
-#'       \item{TN.FP: }{Chi-square test of the comparison of TN versus FP.}
-#'       \item{FN.TP: }{Chi-square test of the comparison of FN versus TP.}
-#'       \item{overall: }{Chi-square test of all four cells of the table.}
-#'       }
-#'      \item{t.test}{Table with t-test results for the comparison of the means. Within the Uncertain Interval, the test scores are compared of individuals without the targeted condition (ref = 0) and individuals with the targeted condition (ref = 1).}
-#'   \item{indices}{A named vector, with the following statistics for the test-scores within the Uncertain Interval:}
-#'     \itemize{
-#'       \item{prevalence: }{Diagnosable patients with the targeted condition / Total diagnosable sample = (TP+FN)/(TN+FP+FN+TP)}
-#'       \item{correct.classification.rate (or Accuracy): }{(TP+TN)/(TN+FP+FN+TP)}
-#'       \item{balance.correct.incorrect: }{(TP+TN)/(FP+FN)}
-#'       \item{specificity: }{TN/(TN+FN)}
-#'       \item{sensitivity: }{TP/(TP+FN)}
-#'       \item{negative.predictive.value: }{TN/(TN+FN)}
-#'       \item{positive.predictive.value: }{TP/(TN+FN)}
-#'       \item{neg.likelihood.ratio: }{(1-sensitivity)/specificity}
-#'       \item{pos.likelihood.ratio: }{sensitivity/(1-specificity)}
-#'       \item{concordance: }{The probability that a random chosen patient with the condition is correctly ranked higher than a randomly chosen patient without the condition. Equal to AUC, with for the uncertain interval an expected outcome < .60. (Not equal to a partial AUC.)}
-#'   }
-#'   }
-#' @details The Uncertain Interval is defined as an interval below and above the intersection, with a sensitivity and specificity below a desired value (default .55). As a result, it is expected that Chi-square tests are not significant, provided that the count of individuals within the Uncertain Interval is not too large. Most often, the t-test is also non-significant, but as the power of the t-test is considerably larger than the power of the Chi-square test, this is less often the case. It is recommended to look at the difference of the means of the two sub-samples and to visually inspect the inter-mixedness of the test scores.
+#' @param threshold.upper The upper decision threshold of a trichotomization
+#'   method. Required.
+#' @param intersection (default = NULL). When NULL, the intersection is
+#'   calculated with \code{get.intersection}, which uses the kernel density
+#'   method to obtain the intersection. When another value is assigned to this
+#'   parameter, this value is used instead.
+#' @param model (default = 'kernel'). The model used defines the intersection.
+#'   Default the kernel densities are used with adjust = 1, for ordinal models
+#'   adjust = 2 is used. For binormal models the binormal estimate of the
+#'   intersection is used. The model defines the intersection, which defines the
+#'   output of this function.
+#' @return{ A list of} \describe{ \item{intersection}{The value used as estimate
+#' of the intersection (that is, the optimal threshold). NOTE: The
+#' trichotomization method TG-ROC has no defined position for its Intermediate
+#' Range, but usage of the point where Sensitivity=Specificity seems a
+#' reasonable choice.} \item{table}{The confusion table of {UI.class x ref} for
+#' the Uncertain Interval where the scores are expected to be inconclusive.
+#' UI.class is the classification of the UI scores divided by the intersection,
+#' 0 (UI scores < intersection and 1 (UI scores >= intersection. This shows
+#' therefore the results when compared with applying the intersection is used
+#' (that is, the optimal dichotomous threshold). Both the reference standard
+#' (ref) and the classification based on the test scores (UI.class) have
+#' categories 0 and 1. Table cell {0, 0} shows the True Negatives (TN), cell {0,
+#' 1} shows the False Negatives (FN), cell {1, 0} shows the False Positives
+#' (FP), and cell {1, 1} shows the True Positives (TP).} \item{cut}{The values
+#' of the thresholds.} \item{X2}{Table with the outcomes of three Chi-square
+#' tests of the confusion table:} \itemize{ \item{TN.FP: }{Chi-square test of
+#' the comparison of TN versus FP.} \item{FN.TP: }{Chi-square test of the
+#' comparison of FN versus TP.} \item{overall: }{Chi-square test of all four
+#' cells of the table.} } \item{t.test}{Table with t-test results for the
+#' comparison of the means. Within the Uncertain Interval, the test scores are
+#' compared of individuals without the targeted condition (ref = 0) and
+#' individuals with the targeted condition (ref = 1).} \item{indices}{A named
+#' vector, with the following statistics for the test-scores within the
+#' Uncertain Interval:} \itemize{ \item{prevalence: }{Classifiable patients with
+#' the targeted condition / Total sample = (TP+FN)/(TN+FP+FN+TP)}
+#' \item{correct.classification.rate (or Accuracy): }{(TP+TN)/(TN+FP+FN+TP)}
+#' \item{balance.correct.incorrect: }{(TP+TN)/(FP+FN)} \item{specificity:
+#' }{TN/(TN+FN)} \item{sensitivity: }{TP/(TP+FN)}
+#' \item{negative.predictive.value: }{TN/(TN+FN)}
+#' \item{positive.predictive.value: }{TP/(TN+FN)} \item{SNPV: standardized
+#' negative predictive value = specificity / (1- sensitivity + specificity)}
+#' \item{SPPV: standardized positive predictive value = sensitivity /
+#' (sensitivity +  1 - specificity)} \item{neg.likelihood.ratio:
+#' }{(1-sensitivity)/specificity} \item{pos.likelihood.ratio:
+#' }{sensitivity/(1-specificity)} \item{concordance: }{The probability that a
+#' random chosen patient with the condition is correctly ranked higher than a
+#' randomly chosen patient without the condition. Equal to AUC, with for the
+#' uncertain interval an expected outcome < .60. (Not equal to a partial AUC.)}
+#' } }
+#' @details The Uncertain Interval is generally defined as an interval below and
+#'   above the intersection, where the densities of the two distributions of
+#'   patients with and without the targeted impairment are about equal. The
+#'   various functions for the estimation of the uncertain interval use a
+#'   sensitivity and specificity below a desired value (default .55). This
+#'   function uses the intersection (the optimal dichotomous threshold) to
+#'   divide the uncertain interval and provides in this way the indices for the
+#'   uncertain interval when the optimal threshold would have been applied.
 #'
-#' The patients that have test scores within the Uncertain Interval cannot be correctly classified on the basis of their test result. The results within the Uncertain Interval differ only slightly for patients with and without the targeted condition. Patients with slightly lower or higher test scores too often have the opposite status. They receive the diagnostic result 'Uncertain'; it is better to apply additional tests or to await further developments.
+#'   As a result, it may be expected that Chi-square tests are not significant,
+#'   provided that the count of individuals within the Uncertain Interval is not
+#'   too large. Most often, the t-test is also non-significant, but as the power
+#'   of the t-test is considerably larger than the power of the Chi-square test,
+#'   this is less often the case. It is recommended to look at the difference of
+#'   the means of the two sub-samples and to visually inspect the
+#'   inter-mixedness of the densities of the test scores.
 #'
-#' When applying the method to the results of a logistic regression, one should be aware of possible problems concerning the determination of the intersection. Somewhere in the middle, logistic predictions can have a range where the distributions have similar densities or have multiple intersections near to each other. Often, this problem can be approached effectively by using the linear predictions instead of the logistic predictions. The linear predictions offer often a far more clear point of intersection. The solution can then be applied to the prediction values using the inverse logit of the intersection and the two cut-points. The logistic predictions and the linear predictions have the same rank ordering.
+#'   The patients that have test scores within the Uncertain Interval are prone
+#'   to be incorrectly classified on the basis of their test result. The results
+#'   within the Uncertain Interval differ only slightly for patients with and
+#'   without the targeted condition. Patients with slightly lower or higher test
+#'   scores too often have the opposite status. They receive the classification
+#'   result 'Uncertain'; it is better to apply additional tests or to await
+#'   further developments.
+#'
+#'   When applying the method to the results of a logistic regression, one
+#'   should be aware of possible problems concerning the determination of the
+#'   intersection. Somewhere in the middle, logistic predictions can have a
+#'   range where the distributions have similar densities or have multiple
+#'   intersections near to each other. Often, this problem can be approached
+#'   effectively by using the linear predictions instead of the logistic
+#'   predictions. The linear predictions offer often a far more clear point of
+#'   intersection. The solution can then be applied to the prediction values
+#'   using the inverse logit of the intersection and the two cut-points. The
+#'   logistic predictions and the linear predictions have the same rank
+#'   ordering.
 #'
 #' @export
 #'
@@ -146,13 +207,18 @@ quality.threshold.uncertain <- function(ref, test,
   specificity = TN/(FP+TN)
   positive.predictive.value=TP/(TP+FP)
   negative.predictive.value=TN/(FN+TN)
+  SNPV = specificity / (specificity + 1 - sensitivity)
+  SPPV = sensitivity / (sensitivity + 1 - specificity)
   correct.classification.rate=(TP+TN)/(TP+FP+FN+TN)
   balance.correct.incorrect=(TP+TN)/(FP+FN)
   likelihood.ratio.pos = sensitivity /(1-specificity)
   likelihood.ratio.neg = (1-sensitivity)/specificity
   bww = sum(ref.uc==1)/sum(ref.uc==0) # 1/bww
+
   ta=addmargins(matrix(c(TN,FP,FN,TP),2,2))
-  dimnames(ta)=list(diag=c('0', '1', 'Sum'), ref= c('0', '1', 'Sum'))
+  lowername = '0 (threshold.lower <= test < intersection)'
+  uppername = '1 (intersection <= test <= threshold.upper)'
+  dimnames(ta)=list(UI.class=c(lowername, uppername, 'Sum'), ref= c('0', '1', 'Sum'))
 
   # if(!raw){
   #   uncertainty = c(uncertain.obs=uncertain.obs, uncertainty.all=uncertainty.all,
@@ -179,6 +245,8 @@ quality.threshold.uncertain <- function(ref, test,
                         sensitivity =sensitivity,
                         negative.predictive.value=negative.predictive.value,
                         positive.predictive.value=positive.predictive.value,
+                        SNPV = SNPV,
+                        SPPV = SPPV,
                         neg.likelihood.ratio = likelihood.ratio.neg,
                         pos.likelihood.ratio = likelihood.ratio.pos,
                         balance.with.without = bww,

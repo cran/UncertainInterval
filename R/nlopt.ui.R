@@ -1,39 +1,67 @@
-#' Function for the determination of the population thresholds an inconclusive interval for bi-normal distributed test scores.
+#' Function for the determination of the population thresholds an uncertain and
+#' inconclusive interval for bi-normal distributed test scores.
 #'
-#' @param Se (default = .55). Desired sensitivity of the test scores within the uncertain interval. A value <= .5 is not allowed.
-#' @param Sp (default = .55). Desired specificity of the test scores within the uncertain interval. A value <= .5 is not allowed.
-#' @param mu0 Population value or estimate of the mean of the test scores of the persons without the targeted condition.
-#' @param sd0 Population value or estimate of the standard deviation of the test scores of the persons without the targeted condition.
-#' @param mu1 Population value or estimate of the mean of the test scores of the persons with the targeted condition.
-#' @param sd1 Population value or estimate of the standard deviation of the test scores of the persons with the targeted condition.
-#' @param intersection Default NULL. If not null, the supplied value is used as the estimate of the intersection of the two bi-normal distributions. Otherwise, it is calculated.
-#' @param start Default NULL. If not null, the first two values of the supplied vector are used as the starting values for the \code{nloptr} optimization function.
-#' @param print.level Default is 0. The option print_level controls how much output is shown during the optimization process. Possible values: 0 (default)	no output; 1	show iteration number and value of objective function; 2	1 + show value of (in)equalities; 3	2 + show value of controls.
+#' @param Se (default = .55). Desired sensitivity of the test scores within the
+#'   uncertain interval. A value <= .5 is not allowed.
+#' @param Sp (default = .55). Desired specificity of the test scores within the
+#'   uncertain interval. A value <= .5 is not allowed.
+#' @param mu0 Population value or estimate of the mean of the test scores of the
+#'   persons without the targeted condition.
+#' @param sd0 Population value or estimate of the standard deviation of the test
+#'   scores of the persons without the targeted condition.
+#' @param mu1 Population value or estimate of the mean of the test scores of the
+#'   persons with the targeted condition.
+#' @param sd1 Population value or estimate of the standard deviation of the test
+#'   scores of the persons with the targeted condition.
+#' @param intersection Default NULL. If not null, the supplied value is used as
+#'   the estimate of the intersection of the two bi-normal distributions.
+#'   Otherwise, it is calculated.
+#' @param start Default NULL. If not null, the first two values of the supplied
+#'   vector are used as the starting values for the \code{nloptr} optimization
+#'   function.
+#' @param print.level Default is 0. The option print.level controls how much
+#'   output is shown during the optimization process. Possible values: 0)
+#'   (default)	no output; 1)	show iteration number and value of objective
+#'   function; 2)	1 + show value of (in)equalities; 3)	2 + show value of
+#'   controls.
 #'
-#' @details The function can be used to determinate the uncertain interval of two bi-normal distributions.
-#' The Uncertain Interval is defined as an interval below and above the intersection of the two distributions, with a sensitivity and specificity below a desired value (default .55).
+#' @details The function can be used to determinate the uncertain interval of
+#'   two bi-normal distributions. The Uncertain Interval is defined as an
+#'   interval below and above the intersection of the two distributions, with a
+#'   sensitivity and specificity below a desired value (default .55).
 #'
-#' Only a single intersection is assumed (or an second intersection where the overlap is negligible).
+#'   Only a single intersection is assumed (or a second intersection where the
+#'   overlap is negligible).
 #'
-#' @return List of values:
-#' \describe{
-#'   \item{$status: }{Integer value with the status of the optimization (0 is success).}
-#'   \item{$message: }{More informative message with the status of the optimization}
-#'   \item{$results: }{Vector with the following values:}
-#'      \itemize{
-#'       \item{exp.Sp.ui: }{The population value of the specificity in the Uncertain Interval, given mu0, sd0, mu1 and sd1. This value should be very near the supplied value of Sp.}
-#'       \item{exp.Sp.ui: }{The population value of the sensitivity in the Uncertain Interval, given mu0, sd0, mu1 and sd1. This value should be very near the supplied value of Se.}
-#'       \item{mu0: }{The value that has been supplied for mu0.}
-#'       \item{sd0: }{The value that has been supplied for sd0.}
-#'       \item{mu1: }{The value that has been supplied for mu1.}
-#'       \item{sd1: }{The value that has been supplied for sd1.}
-#'       }
-#'   \item{$solution: }{Vector with the following values:}
-#'      \itemize{
-#'       \item{L: }{The population value of the lower threshold of the Uncertain Interval.}
-#'       \item{U: }{The population value of the upper threshold of the Uncertain Interval.}
-#'       }
-#' }
+#'   The function uses an optimization algorithm from the nlopt library
+#'   (https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/): the sequential
+#'   quadratic programming (SQP) algorithm for nonlinearly constrained
+#'   gradient-based optimization (supporting both inequality and equality
+#'   constraints), based on the implementation by Dieter Kraft (1988; 1944).
+#'
+#' @return List of values: \describe{ \item{$status: }{Integer value with the
+#'   status of the optimization (0 is success).} \item{$message: }{More
+#'   informative message with the status of the optimization} \item{$results:
+#'   }{Vector with the following values:} \itemize{ \item{exp.Sp.ui: }{The
+#'   population value of the specificity in the Uncertain Interval, given mu0,
+#'   sd0, mu1 and sd1. This value should be very near the supplied value of Sp.}
+#'   \item{exp.Sp.ui: }{The population value of the sensitivity in the Uncertain
+#'   Interval, given mu0, sd0, mu1 and sd1. This value should be very near the
+#'   supplied value of Se.} \item{mu0: }{The value that has been supplied for
+#'   mu0.} \item{sd0: }{The value that has been supplied for sd0.} \item{mu1:
+#'   }{The value that has been supplied for mu1.} \item{sd1: }{The value that
+#'   has been supplied for sd1.} } \item{$solution: }{Vector with the following
+#'   values:} \itemize{ \item{L: }{The population value of the lower threshold
+#'   of the Uncertain Interval.} \item{U: }{The population value of the upper
+#'   threshold of the Uncertain Interval.} } }
+#' @references Dieter Kraft, "A software package for sequential quadratic
+#'   programming", Technical Report DFVLR-FB 88-28, Institut für Dynamik der
+#'   Flugsysteme, Oberpfaffenhofen, July 1988.
+#'
+#'   Dieter Kraft, "Algorithm 733: TOMP–Fortran modules for optimal control
+#'   calculations," ACM Transactions on Mathematical Software, vol. 20, no. 3,
+#'   pp. 262-281 (1994).
+
 #' @export
 #' @importFrom rootSolve uniroot.all
 #' @importFrom nloptr nloptr
@@ -44,7 +72,7 @@
 #' nlopt.ui()
 #' # Using another bi-normal distribution:
 #' nlopt.ui(mu0=0, sd0=1, mu1=1.6, sd1=2)
-#' 
+#'
 # Se = .55; Sp = .55; mu0 = 0; sd0 = 1; mu1 = 1; sd1 = 1; intersection = NULL; start=NULL; print.level=0
 nlopt.ui <- function(Se = .55, Sp = .55,
                      mu0 = 0, sd0 = 1,
@@ -67,7 +95,7 @@ nlopt.ui <- function(Se = .55, Sp = .55,
           A <- 0.5 * (1 / sd1 ^ 2 - 1 / sd0 ^ 2)
           C <-
             0.5 * (mu1 ^ 2 / sd1 ^ 2 - mu0 ^ 2 / sd0 ^ 2) - log(sd0 / sd1)
-          
+
           is = (-B + c(1, -1) * sqrt(B ^ 2 - 4 * A * C)) / (2 * A)
         }
         d = dnorm(is, mu0, sd0) + dnorm(is, mu1, sd1)
@@ -79,7 +107,7 @@ nlopt.ui <- function(Se = .55, Sp = .55,
         intersection=tail(intersection, n=1)
         warning('More than one point of intersection. Highest used.')
       }
-  } 
+  }
 
   # objective function -(H - L)^2
   eval_f0 <- function(x) {

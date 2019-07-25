@@ -1,37 +1,99 @@
-#' Function for the determination of the population thresholds an inconclusive interval for bi-normal distributed test scores.
+#' Function for the determination of the population thresholds an uncertain and
+#' inconclusive interval for test scores with a known common distribution.
 #'
-#' @param Se (default = .55). Desired sensitivity of the test scores within the uncertain interval. A value <= .5 is not allowed, while a value larger than .6 is not recommended.
-#' @param Sp (default = .55). Desired specificity of the test scores within the uncertain interval. A value <= .5 is not allowed, while a value larger than .6 is not recommended.
-#' @param distribution Name of the continuous distribution, exact as used in R package stats. Equal to density function minus d. For instance 'norm'.
-#' @param parameters.d0 Named vector of population values or estimates of the parameters of the distribution of the test scores of the persons without the targeted condition. For instance \code{c(mean = 0, sd = 1)}. This distribution should have the lower values.
-#' @param parameters.d1 Named vector of population values or estimates of the parameters of the distribution of the test scores of the persons with the targeted condition. For instance \code{c(mean = 1, sd = 1)}. The test scores of d1 should have higher values than d1. If not, use -(test scores). This distribution should have the higher values.
-#' @param overlap.interval A vector with a raw estimate of the lower and upper relevant of the overlap of the two distributions. If NULL, set to quantile .001 of the distribution of persons with the targeted condition and quantile .999 of the distribution of persons without the condition. Please check whether this is a good estimate of the relevant overlap.
-#' @param intersection Default NULL. If not null, the supplied value is used as the estimate of the intersection of the two bi-normal distributions. Otherwise, it is calculated.
-#' @param start Default NULL. If not null, the first two values of the supplied vector are used as the starting values for the \code{nloptr} optimization function.
-#' @param print.level Default is 0. The option print_level controls how much output is shown during the optimization process. Possible values: 0 (default)	no output; 1	show iteration number and value of objective function; 2	1 + show value of (in)equalities; 3	2 + show value of controls.
+#' @param Se (default = .55). Desired sensitivity of the test scores within the
+#'   uncertain interval. A value <= .5 is not allowed, while a value larger than
+#'   .6 is not recommended.
+#' @param Sp (default = .55). Desired specificity of the test scores within the
+#'   uncertain interval. A value <= .5 is not allowed, while a value larger than
+#'   .6 is not recommended.
+#' @param distribution Name of the continuous distribution, exact as used in R
+#'   package stats. Equal to density function minus d. For instance when the
+#'   density function is 'dnorm', then the distribution is 'norm'.
+#' @param parameters.d0 Named vector of population values or estimates of the
+#'   parameters of the distribution of the test scores of the persons without
+#'   the targeted condition. For instance \code{c(mean = 0, sd = 1)}. This
+#'   distribution should have the lower values.
+#' @param parameters.d1 Named vector of population values or estimates of the
+#'   parameters of the distribution of the test scores of the persons with the
+#'   targeted condition. For instance \code{c(mean = 1, sd = 1)}. The test
+#'   scores of d1 should have higher values than d0. If not, use -(test scores).
+#'   This distribution should have the higher values.
+#' @param overlap.interval A vector with a raw estimate of the lower and upper
+#'   relevant of the overlap of the two distributions. If NULL, set to quantile
+#'   .001 of the distribution of persons with the targeted condition and
+#'   quantile .999 of the distribution of persons without the condition. Please
+#'   check whether this is a good estimate of the relevant overlap.
+#' @param intersection Default NULL. If not null, the supplied value is used as
+#'   the estimate of the intersection of the two bi-normal distributions.
+#'   Otherwise, it is calculated.
+#' @param start Default NULL. If not null, the first two values of the supplied
+#'   vector are used as the starting values for the \code{nloptr} optimization
+#'   function.
+#' @param print.level Default is 0. The option print.level controls how much
+#'   output is shown during the optimization process. Possible values: 0)
+#'   (default)	no output; 1)	show iteration number and value of objective
+#'   function; 2)	1 + show value of (in)equalities; 3)	2 + show value of
+#'   controls.
 #'
-#' @details The function can be used to determinate the uncertain interval of the two continuous distributions.
-#' The Uncertain Interval is defined as an interval below and above the intersection of the two distributions, with a sensitivity and specificity below a desired value (default .55).
+#' @details The function can be used to determinate the uncertain interval of
+#'   the two continuous distributions. The Uncertain Interval is defined as an
+#'   interval below and above the intersection of the two distributions, with a
+#'   sensitivity and specificity below a desired value (default .55).
 #'
-#' Only a single intersection is assumed (or an second intersection where the overlap is negligible).
+#'   Only a single intersection is assumed (or a second intersection where the
+#'   overlap is negligible).
+#'
+#'   The function uses an optimization algorithm from the nlopt library
+#'
+#'   (https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/).
+#'
+#'   It uses the sequential quadratic programming (SQP) algorithm for
+#'   nonlinearly constrained gradient-based optimization (supporting both
+#'   inequality and equality constraints), based on the implementation by Dieter
+#'   Kraft (1988; 1944).
+#'
+#'   N.B. When a normal distribution is expected, the functions
+#'   \code{\link{nlopt.ui}} and \code{\link{ui.binormal}} are recommended.
 #'
 #' @return List of values:
 #' \describe{
-#'   \item{$status: }{Integer value with the status of the optimization (0 is success).}
-#'   \item{$message: }{More informative message with the status of the optimization}
-#'   \item{$results: }{Vector with the following values:}
+#' \item{$status: }{Integer value with the
+#'   status of the optimization (0 is success).}
+#'     \item{$message: }{More
+#'      informative message with the status of the optimization}
+#'      \item{$results: }{Vector with the following values:}
 #'      \itemize{
-#'       \item{exp.Sp.ui: }{The population value of the specificity in the Uncertain Interval, given mu0, sd0, mu1 and sd1. This value should be very near the supplied value of Sp.}
-#'       \item{exp.Sp.ui: }{The population value of the sensitivity in the Uncertain Interval, given mu0, sd0, mu1 and sd1. This value should be very near the supplied value of Se.}
-#'       \item{vector of parameter values of d0}{The values that have been supplied for d0.}
-#'       \item{vector of parameter values of d1}{The values that have been supplied for d1.}
-#'       }
-#'   \item{$solution: }{Vector with the following values:}
+#'          \item{exp.Sp.ui: }{The
+#'   population value of the specificity in the Uncertain Interval, given mu0,
+#'   sd0, mu1 and sd1. This value should be very near the supplied value of Sp.}
+#'           \item{exp.Sp.ui: }{The population value of the sensitivity in the Uncertain
+#'   Interval, given mu0, sd0, mu1 and sd1. This value should be very near the
+#'   supplied value of Se.}
+#'           \item{vector of parameter values of distribution d0,
+#'   that is, the values that have been supplied in \code{parameters.d0}.}
+#'           \item{vector of parameter values of distribution d1, that is, the values
+#'   that have been supplied in \code{parameters.d1}.}}
+#'    \item{$solution:
+#'   }{Vector with the following values:}
 #'      \itemize{
-#'       \item{L: }{The population value of the lower threshold of the uncertain interval.}
-#'       \item{U: }{The population value of the upper threshold of the uncertain interval.}
-#'       }
-#' }
+#'         \item{L: }{The population
+#'   value of the lower threshold of the uncertain interval.}
+#'         \item{U: }{The
+#'   population value of the upper threshold of the uncertain interval.} }
+#'   }
+#' @references Dieter Kraft, "A software package for sequential quadratic
+#'   programming", Technical Report DFVLR-FB 88-28, Institut für Dynamik der
+#'   Flugsysteme, Oberpfaffenhofen, July 1988.
+#'
+#'   Dieter Kraft, "Algorithm 733: TOMP–Fortran modules for optimal control
+#'   calculations," ACM Transactions on Mathematical Software, vol. 20, no. 3,
+#'   pp. 262-281 (1994).
+#'
+#'   Landsheer, J. A. (2018). The Clinical Relevance of Methods for Handling
+#'   Inconclusive Medical Test Results: Quantification of Uncertainty in Medical
+#'   Decision-Making and Screening. Diagnostics, 8(2), 32.
+#'   https://doi.org/10.3390/diagnostics8020032
 #' @export
 #' @importFrom rootSolve uniroot.all
 #' @importFrom nloptr nloptr
@@ -40,13 +102,15 @@
 #' @examples
 #' # A simple test model:
 #' nlopt.ui.general(Se = .55, Sp = .55,
-#'                  distribution = 'norm',
+#'                  distribution = "norm",
 #'                  parameters.d0 = c(mean = 0, sd = 1),
 #'                  parameters.d1 = c(mean = 1, sd = 1),
 #'                  overlap.interval=c(-2,3))
-#' # Standard procedure when using a continous distribution:
+#' # Standard procedure when using a continuous distribution:
 #' nlopt.ui.general(parameters.d0 = c(mean = 0, sd = 1),
 #'                  parameters.d1 = c(mean = 1.6, sd = 2))
+#' # Function to calculate the Area under the Receiving Operating Characteristics
+#' # Curve (AUC or C-statistic)
 #' emp.AUC <- function(norm, abnorm) {
 #'   o = outer(abnorm, norm, "-")
 #'   mean((o > 0) + .5 * (o == 0))

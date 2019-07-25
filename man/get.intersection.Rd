@@ -4,7 +4,8 @@
 \alias{get.intersection}
 \title{get.intersection Obtain the intersection of two distributions using the kernel method}
 \usage{
-get.intersection(ref, test, model = c("kernel", "binormal", "ordinal"), ...)
+get.intersection(ref, test, model = c("kernel", "binormal", "ordinal"),
+  ...)
 }
 \arguments{
 \item{ref}{The reference standard. A column in a data frame or a vector indicating the classification by the reference test. The reference standard must be coded either as 0 (absence of the condition) or 1 (presence of the condition)}
@@ -19,7 +20,7 @@ get.intersection(ref, test, model = c("kernel", "binormal", "ordinal"), ...)
 A vector of points of intersection, ordered on their density. The tail has the highest density.
 }
 \description{
-\code{get.intersection} Obtain the intersection of two distributions using the kernel method. Warning: This function does not check the parameters ref and test.
+Obtain the intersection of two distributions using the kernel method. Warning: This function does not check the parameters ref and test.
 }
 \examples{
 ref=c(rep(0,500), rep(1,500))

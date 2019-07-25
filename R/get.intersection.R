@@ -1,7 +1,7 @@
 #' get.intersection Obtain the intersection of two distributions using the kernel method
 #'
 #' @name get.intersection
-#' @description \code{get.intersection} Obtain the intersection of two distributions using the kernel method. Warning: This function does not check the parameters ref and test.
+#' @description Obtain the intersection of two distributions using the kernel method. Warning: This function does not check the parameters ref and test.
 #' @param ref The reference standard. A column in a data frame or a vector indicating the classification by the reference test. The reference standard must be coded either as 0 (absence of the condition) or 1 (presence of the condition)
 #' @param test The index test or test under evaluation. A column in a dataset or vector indicating the test results on a continuous scale.
 #' @param model The model used for estimating the intersection(s). Default = 'kernel'.
@@ -34,7 +34,7 @@ get.intersection <-
           A <- 0.5 * (1 / sd1 ^ 2 - 1 / sd0 ^ 2)
           C <-
             0.5 * (mu1 ^ 2 / sd1 ^ 2 - mu0 ^ 2 / sd0 ^ 2) - log(sd0 / sd1)
-          
+
           is = (-B + c(1, -1) * sqrt(B ^ 2 - 4 * A * C)) / (2 * A)
         }
         d = dnorm(is, mu0, sd0) + dnorm(is, mu1, sd1)
