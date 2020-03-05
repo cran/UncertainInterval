@@ -98,6 +98,9 @@
 #' @importFrom rootSolve uniroot.all
 #' @importFrom nloptr nloptr
 #' @import stats
+#' @import MASS
+#' @import car 
+#' 
 #'
 #' @examples
 #' # A simple test model:

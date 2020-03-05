@@ -28,7 +28,8 @@
 #'   classifications, the range of test values >= lower limit provides the
 #'   desired positive accuracy (Se.citerion), while the range of test values <=
 #'   upper limit provides the desired negative accuracy (Sp.citerion). This is
-#'   problematic in its contrariness.
+#'   problematic for its double count: the values in the intermediate zone are
+#'   needed both for the desired Se and for the desired Sp value.
 #'
 #'   Please note that the definition of the intermediate interval deviates from
 #'   the definition of an uncertain interval.

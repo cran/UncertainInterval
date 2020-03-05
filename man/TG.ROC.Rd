@@ -4,9 +4,16 @@
 \alias{TG.ROC}
 \title{Two-Graphs Receiving Operating Characteristics.}
 \usage{
-TG.ROC(ref, test, Se.criterion = 0.9, Sp.criterion = 0.9,
-  model = c("none", "binormal"), plot = FALSE,
-  position.legend = "left", cex.legend = 1)
+TG.ROC(
+  ref,
+  test,
+  Se.criterion = 0.9,
+  Sp.criterion = 0.9,
+  model = c("none", "binormal"),
+  plot = FALSE,
+  position.legend = "left",
+  cex.legend = 1
+)
 }
 \arguments{
 \item{ref}{The reference standard. A column in a data frame or a vector
@@ -54,7 +61,8 @@ This function implements a non-parametric and a bi-normal model. See
   classifications, the range of test values >= lower limit provides the
   desired positive accuracy (Se.citerion), while the range of test values <=
   upper limit provides the desired negative accuracy (Sp.citerion). This is
-  problematic in its contrariness.
+  problematic for its double count: the values in the intermediate zone are
+  needed both for the desired Se and for the desired Sp value.
 
   Please note that the definition of the intermediate interval deviates from
   the definition of an uncertain interval.
