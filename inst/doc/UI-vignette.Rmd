@@ -8,7 +8,7 @@ output:
 ---
 title: "Vignette Uncertain Interval"
 author: "Hans Landsheer"
-date: "24-2-2018"
+date: "6-4-2020"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{"Vignette Uncertain Interval"}
@@ -109,6 +109,8 @@ This interval is located around the intersection, which is determined in the ui.
 ```{r}
 (res=ui.nonpar(psa2b$d, psa2b$tpsa))
 ```
+> Please note that a warning is generated. A second point of intersection is found. We ignore these secondary points, as there are low densities there.  
+
 The thresholds found are 1.92 and 4.00 and 27 + 33 + 55 + 45 = 160 observations are considered as uncertain or indeterminate. The function quality.threshold provides the quality indices of the lower and upper less uncertain intervals (called MCI's or More Certain Intervals). The MCI's concern the patients who actually receive a classification for or against the possible presence of the targeted condition. Patients with an uncertain test score do not receive such a classification. A classification as uncertain points to the necessity of additional data before making a decision. In this case (using the default uncertain interval), the number of false negatives is reduced to 41 of the 355 patients who receive a classification against the targeted condition.
 ```{r}
 (out=quality.threshold(psa2b$d, psa2b$tpsa, res[1], res[2]))
@@ -117,7 +119,7 @@ The sensitivity for the patients who receive a decision for or against the disea
 
 **NOTE 3:** In this case, the uncertain test scores are left out for the calculation of Se and Sp. The indicators Se and Sp are developed for use with a single cut-point. Using the upper and lower bound of the uncertain interval as single cut-points would lead to considering the uncertain test scores as classification errors, which would be nonsensical.
 
-**NOTE 4:** The size of the uncertain interval is open for discussion. In the case of PSA it is certainly possible to argue for a wider interval of uncertian test scores.
+**NOTE 4:** The size of the uncertain interval is open for discussion. In the case of PSA it is certainly possible to argue for a wider interval of uncertain test scores.
 
 
 The function quality.threshold.uncertain provides detailed quality indices for the uncertain interval when applied to the sample. These indices show a low quality, indicating that these test scores provide very uncertain information about the true status of these patients.
@@ -149,14 +151,14 @@ In the case of prostate cancer, the cancer often grows slowly and is often not c
 A wider uncertain interval is obtained by increasing the values of specificity and sensitivity of the uncertain test scores. Higher values make the test scores in the uncertain interval less uncertain, while the test scores outside the uncertain interval provide increased certainty, that is an increased percentage of correct decisions considering the true status of the patient. In the next code block, specificity and sensitivity is increased to respectively .60, .65 and .70.
 
 ```{r echo=TRUE}
-(res=ui.nonpar(psa2b$d, psa2b$tpsa, sens=.60, spec=.60))
-quality.threshold(psa2b$d, psa2b$tpsa, res[1], res[2])$indices[c('specificity',  'sensitivity')]
+(res=ui.nonpar(psa2b$d, psa2b$tpsa, UI.Se = .60, UI.Sp = .60))
+quality.threshold(psa2b$d, psa2b$tpsa, res[1], res[2])$indices[c('MCI.Sp', 'MCI.Se')]
 
-(res=ui.nonpar(psa2b$d, psa2b$tpsa, sens=.65, spec=.65))
-quality.threshold(psa2b$d, psa2b$tpsa, res[1], res[2])$indices[c('specificity',  'sensitivity')]
+(res=ui.nonpar(psa2b$d, psa2b$tpsa, UI.Se =.65, UI.Sp = .65))
+quality.threshold(psa2b$d, psa2b$tpsa, res[1], res[2])$indices[c('MCI.Sp', 'MCI.Se')]
 
-(res=ui.nonpar(psa2b$d, psa2b$tpsa, sens=.70, spec=.70))
-quality.threshold(psa2b$d, psa2b$tpsa, res[1], res[2])$indices[c('specificity',  'sensitivity')]
+(res=ui.nonpar(psa2b$d, psa2b$tpsa, UI.Se =.70, UI.Sp = .70))
+quality.threshold(psa2b$d, psa2b$tpsa, res[1], res[2])$indices[c('MCI.Sp', 'MCI.Se')]
 ```
 
 The function quality.threshold produces several statistics to describe the qualities of the test scores outside the uncertain interval (MCI or More Certain Intervals). In this case, when increasing the uncertain interval, outside the uncertain interval the specificity  improves faster than the sensitivity. However, in the last case, the sensitivity deteriorates for the more certain interval (MCI) outside the defined uncertain interval. The reason for this deterioration is that the number of correctly identified true patients does hardly increase, while the total number of true prostate cancer patients with scores outside the uncertain interval becomes smaller. Increasing the uncertain interval should therefore not be applied blindly. 
@@ -208,7 +210,7 @@ invBoxCox <- function(x, lambda)
 invBoxCox(res1$solution, p1$roundlam)
 
 
-```
+ ```
 Of course, not all problems have disappeared; outliers are still there. The boxplot in figure 7 shows that the outliers in the lower tail are problematic: low scores < -3 indicate both a patient and a non-patient. These extreme scores in the sample also influence the estimates of the bi-normal distributions somewhat.
 
 ```{r fig.cap="Figure 7"}
@@ -236,23 +238,23 @@ invBoxCox(res55$solution, p1$roundlam)
 ```
 Of course, a wider range of test scores can be considered as diagnostically uncertain. In the next block we compare higher values for sensitivity and specificity of the uncertain test scores and show the obtained results for the outer, more certain regions:
 ```{r}
-res60=ui.binormal(psa2b$d[sel], t_tpsa[sel], Se=.60, Sp=.60)
+res60=ui.binormal(psa2b$d[sel], t_tpsa[sel], UI.Se=.60, UI.Sp=.60)
 res60$results
-quality.threshold.uncertain(psa2b$d, t_tpsa, res60$solution[1], res60$solution[2])$indices[c('specificity',  'sensitivity')]
-quality.threshold(psa2b$d, t_tpsa, res60$solution[1], res60$solution[2])$indices[c('specificity',  'sensitivity')]
+quality.threshold.uncertain(psa2b$d, t_tpsa, res60$solution[1], res60$solution[2])$indices[c('UI.Se',  'UI.Sp')]
+quality.threshold(psa2b$d, t_tpsa, res60$solution[1], res60$solution[2])$indices[c('MCI.Se',  'MCI.Sp')]
 
-res65=ui.binormal(psa2b$d[sel], t_tpsa[sel], Se=.65, Sp=.65)
+res65=ui.binormal(psa2b$d[sel], t_tpsa[sel], UI.Se=.65, UI.Sp=.65)
 res65$results
-quality.threshold.uncertain(psa2b$d, t_tpsa, res65$solution[1], res65$solution[2])$indices[c('specificity',  'sensitivity')]
-quality.threshold(psa2b$d, t_tpsa, res65$solution[1], res65$solution[2])$indices[c('specificity',  'sensitivity')]
+quality.threshold.uncertain(psa2b$d, t_tpsa, res65$solution[1], res65$solution[2])$indices[c('UI.Se',  'UI.Sp')]
+quality.threshold(psa2b$d, t_tpsa, res65$solution[1], res65$solution[2])$indices[c('MCI.Se',  'MCI.Sp')]
 
-res70=ui.binormal(psa2b$d[sel], t_tpsa[sel], Se=.70, Sp=.70)
+res70=ui.binormal(psa2b$d[sel], t_tpsa[sel], UI.Se=.70, UI.Sp=.70)
 res70$results
-quality.threshold.uncertain(psa2b$d, t_tpsa, res70$solution[1], res70$solution[2])$indices[c('specificity',  'sensitivity')]
-quality.threshold(psa2b$d, t_tpsa, res70$solution[1], res70$solution[2])$indices[c('specificity',  'sensitivity')]
+quality.threshold.uncertain(psa2b$d, t_tpsa, res70$solution[1], res70$solution[2])$indices[c('UI.Se',  'UI.Sp')]
+quality.threshold(psa2b$d, t_tpsa, res70$solution[1], res70$solution[2])$indices[c('MCI.Se',  'MCI.Sp')]
 
 ```
-The statistics estimated for the uncertain interval of the **modeled distribution** are exactly what we asked for: sensitivity and specificity are respectively .60, .65 and .70. These estimates are no longer solely based on the sample and the values in the sample deviate, as can be expected. In the last example, with sensitivity and specificity set to .7, the sample values are respectively .67 and .73. When the bi-normal model is valid for these test scores, the bi-normal estimates of .7 can be considered as better, but this requires additional prove.
+The statistics estimated for the uncertain interval of the **modeled distribution** are exactly what we asked for: sensitivity and specificity are respectively .60, .65 and .70. These estimates are no longer solely based on the sample and the values in the sample deviate, as can be expected. In the last example, with sensitivity and specificity set to .7, the sample values are respectively .73 and .67. When the bi-normal model is valid for these test scores, the bi-normal estimates of .7 can be considered as better, but this requires additional prove.
 
 The obtained **sample** values for the outer regions show systematic improvements when sensitivity and specificity for the uncertain test scores are higher. These sample values are provided by the quality.threshold function. In the last case, specificity has increased to .97 while sensitivity has increased to .84.
 
@@ -318,7 +320,7 @@ It should be clear that when using this few scores, all quality indices concern 
 ui.ordinal(ref=tostbegg2$d, test=tostbegg2$y, return.all=TRUE)
 ```
 
-The warning indicates that no solution is found for the given (default) ratio constraints (lower ratio .8, upper ratio 1,25). These ratio's limit the ratio of patients with the disease and without the disease within the uncertain interval between .8 and 1.25. The selected candidate is the same as was chosen on the basis of visual inspection. The ui.ordinal function provides directly several quality indices for both possible uncertain intervals and for the test scores outside the uncertain interval (MCI's).
+The warning indicates that no solution is found for the given (default) ratio constraints (lower ratio .8, upper ratio 1.25). These ratio's limit the ratio of patients with the disease and without the disease within the uncertain interval between .8 and 1.25. The selected candidate is the same as was chosen on the basis of visual inspection. The ui.ordinal function provides directly several quality indices for both possible uncertain intervals and for the test scores outside the uncertain interval (MCI's).
 
 ## References
 Etzioni R, Pepe M, Longton G, Hu C, Goodman G (1999). Incorporating the time dimension in receiver operating characteristic curves: A case study of prostate cancer. Medical Decision Making 19:242-51.

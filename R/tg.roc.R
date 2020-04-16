@@ -26,8 +26,8 @@
 #'   Warning: Although the test scores <= the lower limit and the test scores >=
 #'   the upper limit are interpreted for respectively negative and positive
 #'   classifications, the range of test values >= lower limit provides the
-#'   desired positive accuracy (Se.citerion), while the range of test values <=
-#'   upper limit provides the desired negative accuracy (Sp.citerion). This is
+#'   desired positive accuracy (Se.criterion), while the range of test values <=
+#'   upper limit provides the desired negative accuracy (Sp.criterion). This is
 #'   problematic for its double count: the values in the intermediate zone are
 #'   needed both for the desired Se and for the desired Sp value.
 #'
@@ -39,9 +39,9 @@
 #'   thresholds.
 #' @return Thresholds for the intermediate zone. Lower threshold < Test scores <
 #'   Upper threshold is the intermediate range. The range of test values >=
-#'   lower limit provides the desired positive accuracy (Se.citerion), while the
+#'   lower limit provides the desired positive accuracy (Se.criterion), while the
 #'   range of test values <= upper limit provides the desired negative accuracy
-#'   (Sp.citerion).
+#'   (Sp.criterion).
 #' @export
 #' @references Greiner, M. (1995). Two-graph receiver operating characteristic
 #'   (TG-ROC): A Microsoft-EXCEL template for the selection of cut-off values in
